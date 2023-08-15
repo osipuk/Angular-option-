@@ -1,0 +1,518 @@
+<div class="modal-header">
+    <h3>Option Chain</h3>
+    <button type="button" class="btn-close" (click)="modal.dismiss('Cross click')" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <!-- PlaceOrder -->
+    <div class="AccountModal PlaceOrderModal" id="PlaceOrder" aria-hidden="true">
+        <div class="modal-content PlaceOrderContent">
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            <!-- Modal Content Start -->
+            <div class="PlaceOrderTabPannel">
+                <!-- <ul class="nav nav-tabs PlaceOrderTab1" id="PlaceTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                          <button
+                            class="nav-link active" id="ProductList-tab" data-bs-toggle="tab" data-bs-target="#ProductList"
+                            type="button" role="tab" aria-controls="ProductList" aria-selected="true">Product List</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                          <button (click)="switchToStrategyTab()"
+                            class="nav-link" id="PlaceOrderStrategy-tab" data-bs-target="#PlaceOrderStrategy"
+                            data-bs-toggle="modal" data-bs-dismiss="modal">Strategy Template</button>
+                        </li>
+                      </ul> -->
+                <div class="tab-content PlaceOrderTabContent1" id="PlaceTabContent">
+                    <!-- Product List-->
+                    <div class="tab-pane fade show active ProductListContent" id="ProductList" role="tabpanel"
+                        aria-labelledby="ProductList-tab">
+                        <div class="ProductListContentTop">
+                            <div class="optionStockMain">
+                                <div class="SelectSymbol">
+                                    <label>Symbol</label>
+                                    <div class="selectpicker dash-select OptionSelect">
+                                        <ng-select dropdownPosition="bottom" (change)="onProductSelected($event)"
+                                            [items]="Products$ | async" [trackByFn]="searchProductTrackByFn"
+                                            bindLabel="Symbol" [loading]="ProductSearchLoading"
+                                            [(ngModel)]="SelectedProduct" [ngModelOptions]="{standalone: true}"
+                                            placeholder="Type to Search" [typeahead]="ProductInput$">
+                                            <ng-template ng-option-tmp let-item="item" let-index="index">
+                                                <div class="product-name">
+                                                    {{item.ProductName}}
+                                                </div>
+                                                <div class="product-symbol">
+                                                    <b>{{item.Symbol}}</b> [{{item.Currency}}]
+                                                </div>
+                                            </ng-template>
+                                        </ng-select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div *ngIf="!SelectedProduct" class="OptionStockContent"
+                                id="OptionStockContent">
+                                <!-- Option Content -->
+                                <div class="tab-pane" id="Option" role="tabpanel"
+                                    aria-labelledby="Option-tab">
+                                    <div
+                                        style="width: 1224px;height:646px;text-align:center;transform: translateY(25%);">
+                                        Please select product by typing on Symbol field</div>
+                                </div>
+                                <!-- Stock Content -->
+                            </div>
+                            <div *ngIf="SelectedProduct" class="OptionStockContent" id="OptionStockContent">
+                                <!-- Option Content -->
+                                <div class="tab-pane" id="Option" role="tabpanel"
+                                    aria-labelledby="Option-tab">
+                                    <div class="OptionContentMain">
+                                        <!-- Option Left Pannel -->
+                                        <div class="OptionContentLft">
+                                            <div class="OptionContentLftTop">
+                                                <div class="OptionContentFilter1">
+                                                    <form>
+                                                        <div class="form-control">
+                                                            <label>Type</label>
+                                                            <select #typeSelect class="form-select selectDefault"
+                                                                (change)='onTypeChanged(typeSelect.value)'>
+                                                                <option value="All" selected>All</option>
+                                                                <option value="Call">Call</option>
+                                                                <option value="Put">Put</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-control">
+                                                            <label>Expiry Date</label>
+                                                            <select (ngModelChange)='onExpiryDateChanged($event)'
+                                                                [(ngModel)]="SelectedOptionExpiryDate"
+                                                                [ngModelOptions]="{standalone: true}"
+                                                                class="form-select selectDefault DateSelect"
+                                                                aria-label="">
+                                                                <option
+                                                                    *ngFor="let expiryDate of (OptionExpiryDates$ | async)?.ExpiryDates"
+                                                                    [ngValue]="expiryDate">
+                                                                    {{ expiryDate }}
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="OptionContentFilter2">
+                                                    <a class="BtnDefault2" id="FiltertDropdown"
+                                                        data-bs-toggle="dropdown" data-bs-auto-close="true"
+                                                        aria-expanded="false"> Filter <img
+                                                            src="//am708403.blob.core.windows.net/images/optionpi/img/filter2.png">
+                                                    </a>
+                                                    <ul class="dropdown-menu dropdownDefault FilterDrop  dropdown-menu-lg-end dropdown-menu-lg-start"
+                                                        aria-labelledby="FiltertDropdown">
+                                                        <li>
+                                                            <form [formGroup]="stockDataFilterForm"
+                                                                (ngSubmit)="filterStockData()">
+                                                                <table>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <label>Volume</label>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div>
+                                                                                <label>Greater than</label>
+                                                                                <input type="text"
+                                                                                    name="volume_grater_then"
+                                                                                    formControlName="volume_grater_then" />
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div>
+                                                                                <label>Less than</label>
+                                                                                <input type="text"
+                                                                                    name="volume_less_then"
+                                                                                    formControlName="volume_less_then" />
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <label>Delta %</label>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div>
+                                                                                <label>Greater than</label>
+                                                                                <input type="text"
+                                                                                    name="delta_grater_then"
+                                                                                    formControlName="delta_grater_then" />
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div>
+                                                                                <label>Less than</label>
+                                                                                <input type="text"
+                                                                                    name="delta_less_then"
+                                                                                    formControlName="delta_less_then" />
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <label>Open Interest</label>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div>
+                                                                                <label>Greater than</label>
+                                                                                <input type="text"
+                                                                                    name="open_interest_grater_then"
+                                                                                    formControlName="open_interest_grater_then" />
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div>
+                                                                                <label>Less than</label>
+                                                                                <input type="text"
+                                                                                    name="open_interest_less_then"
+                                                                                    formControlName="open_interest_less_then" />
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                                <div class="d-flex justify-content-end">
+                                                                    <button class="BtnDefault" type="submit"
+                                                                        name="submit"
+                                                                        style="margin-right: 10px;">Confirm</button>
+                                                                </div>
+                                                            </form>
+                                                        </li>
+                                                    </ul>
+                                                    <a class="BtnDefault2" id="ColumnDropdown" data-bs-toggle="dropdown"
+                                                        data-bs-auto-close="outside" aria-expanded="false"> Column <img
+                                                            src="//am708403.blob.core.windows.net/images/optionpi/img/column.png">
+                                                    </a>
+                                                    <ul class="dropdown-menu dropdownDefault ColumnDrop dropdown-menu-end"
+                                                        aria-labelledby="dropdownMenuClickableInside">
+                                                        <li>
+                                                            <form>
+                                                                <div class="form-group checkbox"
+                                                                    *ngFor="let placeOrderColumn of placeOrderColumns; let i = index">
+                                                                    <input (click)="filterColumns(i)" type="checkbox"
+                                                                        id={{placeOrderColumn.name}}
+                                                                        name={{placeOrderColumn.name}}
+                                                                        [ngModel]="placeOrderColumn.checked"
+                                                                        ng-checked="placeOrderColumn.checked">
+                                                                    <label
+                                                                        for={{placeOrderColumn.name}}>{{placeOrderColumn.name}}</label>
+                                                                </div>
+                                                            </form>
+                                                        </li>
+                                                    </ul>
+
+                                                    <div>
+                                                        <div class="d-flex">
+                                                            <a (click)="reloadOptionData()"
+                                                                class="BtnSecondary ReloadButton">Reload <img
+                                                                    src="//am708403.blob.core.windows.net/images/optionpi/img/reload.png"></a>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            <div class="OptionContentLftBtm">
+                                                <app-loading [status]="isLoading"></app-loading>
+                                                <div class="d-flex flex-wrap fixedTable">
+                                                    <div [ngClass]="OptionTable4Classes">
+                                                        <aside class="fixedTable-sidebar table4" #table4ScrollElement
+                                                            (scroll)="scrollTable4Handler($event)">
+                                                            <table *ngIf="!isLoading"
+                                                                class="table selectTable text-center myTable4"
+                                                                id="myTable4" [ngStyle]="dynamicStyleTable4">
+                                                                <thead>
+                                                                    <tr class="callHead">
+                                                                        <th rowspan="2" class="NonClick">Strike
+                                                                            Price</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr *ngFor="let snapshoot of OptionSnapshotData">
+                                                                        <td class="NonClick">
+                                                                            {{snapshoot.StrikePrice}}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </aside>
+                                                    </div>
+                                                    <div [ngClass]="OptionTable1Classes">
+                                                        <div class="fixedTable-body table1" #table1ScrollElement
+                                                            (scroll)="scrollTable1Handler($event)">
+                                                            <!-- <div class="table-responsive"> -->
+                                                            <table *ngIf="!isLoading"
+                                                                class="table selectTable text-center myTable1"
+                                                                id="myTable1" [ngStyle]="dynamicStyleTable1">
+                                                                <thead>
+                                                                    <tr class="callHead">
+                                                                        <ng-container
+                                                                            *ngFor="let callTableColumn of callTableColumns">
+                                                                            <th
+                                                                                *ngIf="placeOrderColumns.length > 0 && getStatusByColumn(callTableColumn.key)">
+                                                                                {{callTableColumn.label}}</th>
+                                                                        </ng-container>
+                                                                    </tr>
+                                                                    <tr class="callHead">
+                                                                        <th colspan="6">Call</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody style="width: 100%; float: left;">
+                                                                    <tr (click)="setSelectedPlaceOrderRowCall(snapshoot)"
+                                                                        [ngClass]="{ 'Highlight' : snapshoot.Call.isSelected !== undefined && snapshoot.Call.isSelected, 'callBG': (snapshoot.StrikePrice < placeOrderLastTradedPrice) }"
+                                                                        *ngFor="let snapshoot of OptionSnapshotData; let i = index;">
+                                                                        <ng-container
+                                                                            *ngFor="let callTableColumn of callTableColumns">
+                                                                            <td
+                                                                                *ngIf="placeOrderColumns.length > 0 && getStatusByColumn(callTableColumn.key)">
+                                                                                {{checkValueByKey(snapshoot.Call,
+                                                                                callTableColumn)}}</td>
+                                                                        </ng-container>
+                                                                    </tr>
+                                                                </tbody>
+
+
+                                                                <!-- <thead *ngIf="selectedType === 'Call'" style="display: none;" >
+                                                <tr class="callHead">
+                                                  <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('BidVolume')">Bid Vol.</th>
+                                                  <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('Bid')">Bid</th>
+                                                  <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('Ask')">Ask</th>
+                                                  <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('AskVolume')">Ask Vol.</th>
+                                                  <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('BreakEvenPct')">Break Even %</th>
+                                                  <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('PctChange')">% Change</th>
+                                                </tr>
+                                                <tr class="callHead">
+                                                  <th colspan="6">Call</th>
+                                                </tr>
+                                              </thead>
+                                              <thead *ngIf="selectedType === 'All'" style="display: none;">
+                                                <tr class="callHead">
+                                                  <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('PctChange')">% Change</th>
+                                                  <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('BreakEvenPct')">Break Even %</th>
+                                                  <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('AskVolume')">Ask Vol. <i class="bi bi-arrow-down"></i></th>
+                                                  <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('Ask')">Ask</th>
+                                                  <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('Bid')">Bid</th>
+                                                  <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('BidVolume')">Bid Vol.</th>
+                                                </tr>
+                                                <tr class="callHead">
+                                                  <th colspan="6">Call</th>
+                                                </tr>
+                                              </thead>
+                                              <tbody style="width: 100%; float: left; display: none;" *ngIf="selectedType === 'Call'">
+                                                <tr (click)="setSelectedPlaceOrderRowCall(snapshoot)"
+                                                  [ngClass]="{ 'Highlight' : snapshoot.Call.isSelected !== undefined && snapshoot.Call.isSelected, 'callBG': (snapshoot.StrikePrice < placeOrderLastTradedPrice) }"
+                                                  *ngFor="let snapshoot of OptionSnapshotData">
+                                                  <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('BidVolume')">{{snapshoot.Call.BidVolume}}</td>
+                                                  <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('Bid')">{{snapshoot.Call.Bid}}</td>
+                                                  <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('Ask')">{{snapshoot.Call.Ask}}</td>
+                                                  <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('AskVolume')">{{snapshoot.Call.AskVolume}}</td>
+                                                  <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('BreakEvenPct')">{{snapshoot.Call.BreakEvenPct | percent:'1.2-2'}}</td>
+                                                  <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('PctChange')"><span [ngClass]="{'red_number' : snapshoot.Call.PctChange < 0, 'green_number' : snapshoot.Call.PctChange > 0}">{{snapshoot.Call.PctChange | percent:'1.2-2'}}</span></td>
+                                                </tr>
+                                              </tbody>
+                                              <tbody style="width: 100%; float: left; display: none" *ngIf="selectedType === 'All'" >
+                                                <tr (click)="setSelectedPlaceOrderRowCall(snapshoot)"
+                                                  [ngClass]="{ 'Highlight' : snapshoot.Call.isSelected !== undefined && snapshoot.Call.isSelected, 'callBG': (snapshoot.StrikePrice < placeOrderLastTradedPrice) }"
+                                                  *ngFor="let snapshoot of OptionSnapshotData">
+                                                  <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('PctChange')"><span [ngClass]="{'red_number' : snapshoot.Call.PctChange < 0, 'green_number' : snapshoot.Call.PctChange > 0}">{{snapshoot.Call.PctChange | percent:'1.2-2'}}</span></td>
+                                                  <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('BreakEvenPct')">{{snapshoot.Call.BreakEvenPct | percent:'1.2-2'}}</td>
+                                                  <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('AskVolume')">{{snapshoot.Call.AskVolume}}</td>
+                                                  <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('Ask')">{{snapshoot.Call.Ask}}</td>
+                                                  <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('Bid')">{{snapshoot.Call.Bid}}</td>
+                                                  <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('BidVolume')">{{snapshoot.Call.BidVolume}}</td>
+                                                </tr>
+                                              </tbody> -->
+                                                            </table>
+                                                            <!-- </div> -->
+                                                        </div>
+                                                    </div>
+                                                    <div [ngClass]="OptionTable2Classes">
+                                                        <aside class="fixedTable-sidebar table2" #table2ScrollElement
+                                                            (scroll)="scrollTable2Handler($event)">
+                                                            <!-- <div class="table-responsive w-auto overflow-x"> -->
+                                                            <table *ngIf="!isLoading"
+                                                                class="table selectTable text-center myTable2"
+                                                                id="myTable2" [ngStyle]="dynamicStyleTable2">
+                                                                <thead>
+                                                                    <tr class="callHead">
+                                                                        <th rowspan="2" class="NonClick">Strike
+                                                                            Price</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr [ngClass]="{ 'Highlight' : (snapshoot.Call.isSelected !== undefined && snapshoot.Call.isSelected || snapshoot.Put.isSelected !== undefined && snapshoot.Put.isSelected) }"
+                                                                        *ngFor="let snapshoot of OptionSnapshotData">
+                                                                        <td class="NonClick">
+                                                                            {{snapshoot.StrikePrice}}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <!-- </div> -->
+                                                        </aside>
+                                                    </div>
+                                                    <div [ngClass]="OptionTable3Classes">
+                                                        <div class="fixedTable-body table3" #table3ScrollElement
+                                                            (scroll)="scrollTable3Handler($event)">
+                                                            <!-- <div class="table-responsive"> -->
+                                                            <table *ngIf="!isLoading"
+                                                                class="table selectTable text-center myTable3"
+                                                                id="myTable3" [ngStyle]="dynamicStyleTable3">
+
+                                                                <thead>
+                                                                    <tr class="putHead">
+                                                                        <ng-container
+                                                                            *ngFor="let putTableColumn of putTableColumns">
+                                                                            <th
+                                                                                *ngIf="placeOrderColumns.length > 0 && getStatusByColumn(putTableColumn.key)">
+                                                                                {{putTableColumn.label}}</th>
+                                                                        </ng-container>
+                                                                    </tr>
+                                                                    <tr class="putHead">
+                                                                        <th colspan="6">Put</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody style="width: 100%; float: left;">
+                                                                    <tr (click)="setSelectedPlaceOrderRowPut(snapshoot)"
+                                                                        [ngClass]="{ 'Highlight' : snapshoot.Put.isSelected !== undefined && snapshoot.Put.isSelected, 'putBG': (snapshoot.StrikePrice > placeOrderLastTradedPrice) }"
+                                                                        *ngFor="let snapshoot of OptionSnapshotData; let i = index;">
+                                                                        <ng-container
+                                                                            *ngFor="let putTableColumn of putTableColumns">
+                                                                            <td
+                                                                                *ngIf="placeOrderColumns.length > 0 && getStatusByColumn(putTableColumn.key)">
+                                                                                {{checkValueByKey(snapshoot.Put,
+                                                                                putTableColumn)}}</td>
+                                                                        </ng-container>
+                                                                    </tr>
+                                                                </tbody>
+
+                                                                <!-- <thead style="display: none;">
+                                                <tr class="putHead">
+                                                  <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('BidVolume')">Bid Vol.</th>
+                                                  <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('Bid')">Bid</th>
+                                                  <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('Ask')">Ask</th>
+                                                  <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('AskVolume')">Ask Vol.</th>
+                                                  <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('BreakEvenPct')">Break Even %</th>
+                                                  <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('PctChange')">% Change</th>
+                                                </tr>
+                                                <tr class="putHead">
+                                                  <th colspan="6">Put</th>
+                                                </tr>
+                                              </thead>
+                                              <tbody style="width: 100%; float: left; display: none;">
+                                                <tr (click)="setSelectedPlaceOrderRowPut(snapshoot)"
+                                                  [ngClass]="{ 'Highlight' : snapshoot.Put.isSelected !== undefined && snapshoot.Put.isSelected, 'putBG': (snapshoot.StrikePrice > placeOrderLastTradedPrice) }"
+                                                  *ngFor="let snapshoot of OptionSnapshotData">
+                                                  <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('BidVolume')">{{snapshoot.Put.BidVolume}}</td>
+                                                  <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('Bid')">{{snapshoot.Put.Bid}}</td>
+                                                  <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('Ask')">{{snapshoot.Put.Ask}}</td>
+                                                  <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('AskVolume')">{{snapshoot.Put.AskVolume}}</td>
+                                                  <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('BreakEvenPct')">{{snapshoot.Put.BreakEvenPct | percent:'1.2-2'}}</td>
+                                                  <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn('PctChange')"><span [ngClass]="{'red_number' : snapshoot.Put.PctChange < 0, 'green_number' : snapshoot.Put.PctChange > 0}">{{snapshoot.Put.PctChange | percent:'1.2-2'}}</span></td>
+                                                </tr>
+                                              </tbody> -->
+                                                            </table>
+                                                            <!-- </div> -->
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Option Right Pannel -->
+                                        <div class="OptionContentRgt">
+                                            <form class="OptForm" [formGroup]="OptionOrderForm"
+                                                (ngSubmit)="submitOptionOrder()">
+                                                <div class="form-control">
+                                                    <label>Action</label>
+                                                    <select formControlName="SelectedOptionAction" class="form-select"
+                                                        aria-label="Default select example">
+                                                        <option value="Buy" selected="">Buy</option>
+                                                        <option value="Sell">Sell</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-control">
+                                                    <label>Contract</label>
+                                                    <input [(ngModel)]="SelectedOptionContract"
+                                                        [ngModelOptions]="{standalone: true}" type="text" name="product"
+                                                        placeholder="">
+                                                    <!-- <ng-select
+                                          dropdownPosition="bottom"
+                                          (change)="onOptionContractSelected($event)"
+                                          [items]="OptionContracts$ | async"
+                                          [trackByFn]="searchOptionContractTrackByFn"
+                                          bindLabel="Symbol"
+                                          [loading]="OptionContractSearchLoading"
+                                          [(ngModel)]="SelectedOptionContract"
+                                          [ngModelOptions]="{standalone: true}"
+                                          placeholder="Choose Option Contract"
+                                          [typeahead]="OptionContractInput$">
+                                          <ng-template ng-option-tmp let-item="item" let-index="index">
+                                            <div class="product-name">
+                                              {{item.ProductName}}
+                                            </div>
+                                            <div class="product-symbol">
+                                              <b>{{item.Symbol}}</b> [{{item.Currency}}]
+                                            </div>
+                                          </ng-template>
+                                        </ng-select> -->
+                                                    <a *ngIf="SelectedOptionContract" class="BtnDefault ComputeButton"
+                                                        data-bs-target="#Calculator" data-bs-toggle="modal"
+                                                        data-bs-dismiss="modal"
+                                                        (click)="loadCalculatorModal()">Analyze<img
+                                                            src="//am708403.blob.core.windows.net/images/optionpi/img/beaker.png"></a>
+                                                </div>
+                                                <div class="form-control">
+                                                    <label>Quantity</label>
+                                                    <div>
+                                                        <input formControlName="OptionQuantity" type="text"
+                                                            name="quantity" value="1">
+                                                        <label>Lot</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-control">
+                                                    <label>Type: Limit</label>
+                                                </div>
+                                                <div class="form-control">
+                                                    <label>Limit Price</label>
+                                                    <div>
+                                                        <input formControlName="OptionLimitPrice" type="text"
+                                                            name="price">
+                                                        <a (click)="decreaseOptionLimitPrice()" class="DangerBg">
+                                                            <i class="bi bi-arrow-down-circle"></i>
+                                                        </a>
+                                                        <a (click)="increaseOptionLimitPrice()" class="SuccessBg">
+                                                            <i class="bi bi-arrow-up-circle"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="form-control">
+                                                    <label>Validity: Day</label>
+                                                </div>
+                                                <div class="form-control">
+                                                    <label>Account</label>
+                                                    <div>
+                                                        <select formControlName="SelectedAccount"
+                                                            class="form-select selectDefault" aria-label="Account"
+                                                            style="width: 100%;">
+                                                            <option
+                                                                *ngFor="let brokerAccount of AvailableBrokerAccounts"
+                                                                [ngValue]="brokerAccount">
+                                                                {{ brokerAccount.id }}
+                                                                ({{brokerAccount.brokerType}})
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <button class="BtnDefault w-100" type="submit" name="submit"
+                                                    data-bs-toggle="modal" data-bs-target="#ConfirmOptionOrder"
+                                                    data-bs-toggle="modal" data-bs-dismiss="modal"> Submit </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Strategy Template -->
+                    <!-- <div class="tab-pane fade" id="Strategy" role="tabpanel" aria-labelledby="Strategy-tab">...</div> -->
+                </div>
+            </div>
+            <!-- Modal Content End -->
+        </div>
+    </div>
+</div>

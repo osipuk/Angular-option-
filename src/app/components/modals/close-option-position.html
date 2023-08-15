@@ -1,0 +1,185 @@
+<div class="modal-header">
+    <h3>Close Position</h3>
+    <button type="button" class="btn-close" (click)="modal.dismiss('Cross click')" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <!-- PlaceOrder -->
+    <div class="AccountModal PlaceOrderModal" id="CloseOptionPosition" aria-hidden="true">
+        <div class="modal-content PlaceOrderContent">
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            <h3>Close Option Position</h3>
+            <!-- Modal Content Start -->
+            <div class="PlaceOrderTabPannel">
+                <div class="tab-content PlaceOrderTabContent1" id="PlaceTabContent">
+                    <!-- Product List-->
+                    <div class="tab-pane fade show active ProductListContent" id="ProductList" role="tabpanel"
+                        aria-labelledby="ProductList-tab">
+                        <div class="ProductListContentTop">
+                            <div class="optionStockMain">
+                                <div class="SelectSymbol">
+                                    <label>Symbol</label>
+                                    <div>
+                                        {{OptionPositionToClose.Product}}
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Stock Content -->
+                            <div class="tab-pane fade show active StockContentMain" id="Stock" role="tabpanel"
+                                aria-labelledby="Stock-tab">
+                                <div class="StockContentMainTop">
+                                    <ul>
+                                        <li>
+                                            <div>
+                                                <p>Last</p>
+                                                <h2>{{OptionData.LastTradedPrice | number}}</h2>
+                                            </div>
+                                            <div>
+                                                <p>Today Volume</p>
+                                                <h2>{{OptionData.CumulativeVolume | number}}</h2>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="DangerBg">
+                                                <div>
+                                                    <p>Bid Vol</p>
+                                                    <p>Bid</p>
+                                                </div>
+                                            </div>
+                                            <div class="SuccessBg">
+                                                <div>
+                                                    <p>Ask</p>
+                                                    <p>Ask Vol</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <div>
+                                                    <p>{{OptionData.BidSize | number}}</p>
+                                                    <p>{{OptionData.BidPrice | number}}</p>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div>
+                                                    <p>{{OptionData.AskSize | number}}</p>
+                                                    <p>{{OptionData.AskPrice | number}}</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="StockContentMainBtm">
+                                    <form class="OptForm" [formGroup]="OptionOrderForm"
+                                        (ngSubmit)="submitOptionOrder()">
+                                        <div class="form-control">
+                                            <label>Action</label>
+                                            <label>{{OptionPositionToClose.Action}}</label>
+                                        </div>
+                                        <div class="form-control">
+                                            <label>Quantity</label>
+                                            <label>{{OptionPositionToClose.Quantity}} Unit</label>
+                                        </div>
+                                        <div class="form-control">
+                                            <label>Type</label>
+                                            <label>Limit</label>
+                                        </div>
+                                        <div class="form-control">
+                                            <label>Limit Price</label>
+                                            <div>
+                                                <input formControlName="OptionLimitPrice" type="text" name="price">
+                                                <a (click)="decreaseOptionLimitPrice()" class="DangerBg">
+                                                    <i class="bi bi-arrow-down-circle"></i>
+                                                </a>
+                                                <a (click)="increaseOptionLimitPrice()" class="SuccessBg">
+                                                    <i class="bi bi-arrow-up-circle"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="form-control">
+                                            <label>Validity</label>
+                                            <div class="radioDefault">
+                                                <label>
+                                                    Day
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="form-control">&nbsp;</div>
+                                        <div
+                                            style="width: 100%; float: left; border-top: 1px solid #d3d3d3; height: 0; margin-bottom: 10px;">
+                                            &nbsp;</div>
+                                        <div class="form-control">
+                                            <label style="width: 25%; float: left; margin-top: 10px;">Account</label>
+                                            <div>{{SelectedBrokerAccount.id}} ({{SelectedBrokerAccount.brokerType}})
+                                            </div>
+                                        </div>
+                                        <div class="form-control">
+                                            <button type="submit" name="submit" class="BtnDefault w-100"
+                                                data-bs-toggle="modal" data-bs-target="#ConfirmCloseOptionOrder"
+                                                data-bs-toggle="modal" data-bs-dismiss="modal" style="margin-top: 2px;">
+                                                Submit
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Strategy Template -->
+                    <!-- <div class="tab-pane fade" id="Strategy" role="tabpanel" aria-labelledby="Strategy-tab">...</div> -->
+                </div>
+            </div>
+            <!-- Modal Content End -->
+        </div>
+    </div>
+</div>
+
+<!-- Confirm Order -->
+<div class="modal fade AccountModal ConfirmOrderModal" id="ConfirmCloseOptionOrder" aria-hidden="true" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-body">
+          <h4>This option order will be created:</h4>
+          <table>
+            <tr>
+              <th>Action</th>
+              <td>
+                <span class="textHighlight">{{ConfirmedOptionOrder.action}}</span>
+              </td>
+            </tr>
+            <tr>
+              <th>Account</th>
+              <td>{{ConfirmedOptionOrder.account}} ({{ConfirmedOptionOrder.broker}})</td>
+            </tr>
+            <tr>
+              <th>Product</th>
+              <td>{{ConfirmedOptionOrder.product}}</td>
+            </tr>
+            <tr>
+              <th>Quantity</th>
+              <td>{{ConfirmedOptionOrder.quantity}} {{ConfirmedOptionOrder.unitType}}</td>
+            </tr>
+            <tr>
+              <th>Order Type</th>
+              <td>{{ConfirmedOptionOrder.orderType}}</td>
+            </tr>
+            <tr>
+              <th>Limit Price</th>
+              <td>US$ {{ConfirmedOptionOrder.limitPrice}}</td>
+            </tr>
+            <tr>
+              <th>Validity</th>
+              <td>{{ConfirmedOptionOrder.validity}}</td>
+            </tr>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button class="BtnSecondary" data-bs-target="#CloseOptionPosition" data-bs-toggle="modal" data-bs-dismiss="modal">
+            <i class="bi bi-arrow-left"></i> Previous </button>
+          <button class="BtnDefault" (click)="confirmSendOptionOrder()" data-bs-toggle="modal" data-bs-dismiss="modal">Submit
+            <i class="bi bi-cart"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>

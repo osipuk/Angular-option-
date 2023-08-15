@@ -1,0 +1,17 @@
+export interface CalculatePayoffRequest {
+    Strategy: string | undefined,
+    Underlying: string | undefined ,
+    OptionContracts: string,
+    Capital: number,
+    UnderlyingPrice: number,
+    BundlePrice: number,
+    AtmIV: number,
+    DivYield: number,
+    RiskFreeRate: number,
+    DaysToExpiry: number,
+    NextStateDays: number,
+    NextStateUnderlyingPrice: number,
+    NextStateAtmIV: number,
+    NextStateRiskFreeRate: number,
+    NextStateDivYield: number,
+}

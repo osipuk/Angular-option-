@@ -1,0 +1,24 @@
+
+<!-- Strategy Order Rejected #StrategyOrderRejected-->
+<div class="modal fade AccountModal OrderRejectModal StrategyOrderRejectedModal" id="StrategyOrderRejected"
+  aria-hidden="true" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-body">
+        <h4>Order rejected!</h4>
+        <div>
+          <img src="//am708403.blob.core.windows.net/images/optionpi/img/cancel.png">
+          <p class="PriceLine">
+            <strong>{{StrategyOrderRejectedParameter.Strategy}} #
+              {{StrategyOrderRejectedParameter.Underlying}},</strong> Underlying Price = {{(StockData$ |
+            async)?.LastTradedPrice | currency:'USD'}}
+          </p>
+          <p>Your order has been rejected for following reason:
+            <span class="text-alert">{{StrategyOrderRejectedParameter.RejectReason}}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

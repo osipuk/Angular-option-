@@ -1,0 +1,22 @@
+
+<!-- Order Rejected -->
+<div class="modal fade AccountModal OrderRejectModal" id="OrderRejected" aria-hidden="true" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-body">
+          <h4>Order rejected!</h4>
+          <div>
+            <img src="//am708403.blob.core.windows.net/images/optionpi/img/cancel.png">
+            <h5>{{OrderRejectedParameter.Action}} {{OrderRejectedParameter.Quantity}} {{OrderRejectedParameter.Symbol}}
+              <span *ngIf="OrderRejectedParameter.OrderType === 'Limit'">@ {{OrderRejectedParameter.LimitPrice}}</span>
+              <span *ngIf="OrderRejectedParameter.OrderType === 'Stop'">@ {{OrderRejectedParameter.StopPrice}}</span>
+            </h5>
+            <p>Your order has been rejected for following reason:
+              <span class="text-alert">{{OrderRejectedParameter.RejectReason}}</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

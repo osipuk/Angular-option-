@@ -1,0 +1,10 @@
+  <app-mobile-menu></app-mobile-menu>
+  <main id="main" class="content-wrapper">
+    <div class="mainBlock">
+      <app-sidebar></app-sidebar>
+      <div class="RgtMain">
+        <app-header [bradcrumb]="bradcrumb" (tabSelected)="onTabSelected($event)"></app-header>
+        <ow-main-tab [tabValue]="selectedTab"></ow-main-tab>
+      </div>
+    </div>
+  </main>

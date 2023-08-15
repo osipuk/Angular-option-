@@ -1,0 +1,253 @@
+<div class="tab-pane ActivePositionTab show active" role="tabpanel" aria-labelledby="ActivePosition-tab">
+  <div class="ActivePositionFilterBar">
+    <form>
+      <div class="form-control">
+        <div class="FilterBarsearch">
+          <input type="text" class="form-control" placeholder="Search" aria-label=""
+            aria-describedby="basic-addon1">
+          <a class="FilterBarSearchIcon">
+            <i class="fa fa-magnifying-glass" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </form>
+  </div>
+  <!-- Set Portfolio Alert -->
+  <div class="modal fade AccountModal PortfolioAlertModal" id="PortfolioAlert" aria-hidden="true" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+       <div class="modal-content">
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h3>Set Portfolio alert</h3>
+          <div class="PortfolioAlertContent">
+             <form class="w-100 SideBarForm">
+                <div class="form-control w-100">
+                   <label>Mode</label>
+                   <div class="radioDefault">
+                      <label (click)="setActivePositionMode('Pal')">
+                      <input type="radio" name="activePositionModes[]" checked="{{(activePositionMode === 'Pal' ? 'checked' : '')}}" id="Pal" /> P/L </label>
+                      <label (click)="setActivePositionMode('Time')">
+                      <input type="radio" name="activePositionModes[]" checked="{{(activePositionMode === 'Time' ? 'checked' : '')}}" id="Time" /> Time </label>
+                      <label (click)="setActivePositionMode('Target')">
+                      <input type="radio" name="activePositionModes[]" checked="{{(activePositionMode === 'Target' ? 'checked' : '')}}" id="Target" /> Target </label>
+                   </div>
+                </div>
+                <div *ngIf="activePositionMode === 'Pal'" class="w-100" id="PalBlock">
+                   <div class="form-control w-100">
+                      <label>Profit Trigger (USD)</label>
+                      <input type="text" name="profit" placeholder="Input Value" class="w-100">
+                   </div>
+                   <div class="form-control w-100">
+                      <label>Loss Trigger (USD)</label>
+                      <input type="text" name="loss" placeholder="Input Value" class="w-100">
+                   </div>
+                </div>
+                <div *ngIf="activePositionMode === 'Time'" class="w-100" id="TimeBlock">
+                   <div class="form-control w-100">
+                      <label>Days Left to Expiry</label>
+                      <input type="text" name="expiry" placeholder="Input Value" class="w-100">
+                   </div>
+                </div>
+                <div *ngIf="activePositionMode === 'Target'" class="w-100" id="TargetBloack">
+                   <div class="form-control w-100">
+                      <label>% of Max Profit</label>
+                      <input type="text" name="maxprofit" placeholder="Input Value" class="w-100">
+                      <span>Max Profit USD 10000</span>
+                   </div>
+                   <div class="form-control w-100">
+                      <label>% of Max Loss</label>
+                      <input type="text" name="maxloss" placeholder="Input Value" class="w-100">
+                      <span>Max Loss USD 3000</span>
+                   </div>
+                </div>
+             </form>
+             <div class="modal-footer">
+                <button class="BtnDefault w-100">Set Alert</button>
+             </div>
+          </div>
+       </div>
+    </div>
+ </div>
+  <div class="ActivePositionTable">
+    <div class="table-responsive" style="min-height: 100px;">
+      <app-loading [status]="isLoadingActivePositions"></app-loading>
+      <table *ngIf="!isLoadingActivePositions" class="table">
+        <thead>
+          <tr>
+            <th class="text-center">Leg</th>
+            <th>Symbol<a><i class="fa fa-arrow-down" aria-hidden="true"></i></a></th>
+            <th>Pos</th>
+            <th>Qty</th>
+            <th>Entry</th>
+            <th>UPL</th>
+            <th>Con</th>
+            <th>Expiry</th>
+            <th>Strike</th>
+            <th>Multiplier</th>
+            <th>Entry Time</th>
+            <th style="text-align: center;width: 100px;">AI Recomm</th>
+            <th style="text-align: center;width: 80px;"></th>
+            <th style="text-align: center;width: 100px;">Exit Alert</th>
+          </tr>
+          <!-- <tr *ngIf="!isCollapsed">
+            <th class="text-center">Leg</th>
+            <th>Symbol<a><i class="fa fa-arrow-down" aria-hidden="true"></i></a></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>UPL</th>
+            <th></th>
+            <th style="width: 270px;"></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th style="text-align: center;width: 80px;"></th>
+            <th style="text-align: center;width: 100px;">Exit Alert</th>
+          </tr> -->
+        </thead>
+        <tbody>
+          <tr *ngIf="!isLoadingActivePositions && checkIsEmptyObject(ActivePositionList)">
+            <td style="text-align: center;" colspan="14">There is currently no entries available</td>
+          </tr>
+          <ng-container *ngFor="let activePosition of ActivePositionList | keyvalue">
+            <ng-container *ngIf="activePosition.value.hasFilledLeg">
+              <tr class="OnClickAdd">
+                <td class="AddPlus">
+                  <a (click)="toggleCollapsedActivePosition(activePosition)"><span class="Plus" [ngClass]="{'added' : !activePosition.value.isCollapsed}"></span></a>
+                </td>
+                <td>
+                  <h4>{{activePosition.value.product}} Portfolio #{{activePosition.key}} {{activePosition.value.strategy}}</h4>
+                </td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><span [ngClass]="{'red_number' : activePosition.value.aggregatedUPL < 0, 'green_number' : activePosition.value.aggregatedUPL > 0}">{{activePosition.value.aggregatedUPL | currency:'USD'}}</span></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                  <a tooltip="This is the AI recommendation" placement="top"><i class="bi bi-info-circle"></i></a>
+                </td>
+                <td style="text-align: center;">
+                  <a *ngIf="activePosition.value.strategy.includes('Stock')"
+                  (click)="closeStockPosition(activePosition.value)" class="BtnSecondary" data-bs-toggle="modal" href="#CloseStockPosition" role="button">Close</a>
+                  <a *ngIf="activePosition.value.strategy === 'Long Call' || activePosition.value.strategy === 'Long Put' || activePosition.value.strategy === 'Short Call' || activePosition.value.strategy === 'Short Put'"
+                  (click)="closeOptionPosition(activePosition.value)" class="BtnSecondary" data-bs-toggle="modal" href="#CloseOptionPosition" role="button">Close</a>
+                  <a *ngIf="!activePosition.value.strategy.includes('Stock') && !(activePosition.value.strategy === 'Long Call' || activePosition.value.strategy === 'Long Put' || activePosition.value.strategy === 'Short Call' || activePosition.value.strategy === 'Short Put')"
+                  (click)="closeStrategyPosition(activePosition.value)" class="BtnSecondary" data-bs-toggle="modal" href="#CloseStrategy" role="button">Close</a>
+                </td>
+                <td style="text-align: center;" >
+                  <a (click)="setActivePositionAlertData(activePosition)" class="BtnSecondary" data-bs-toggle="modal" href="#PortfolioAlert" role="button">Set Alert</a>
+                </td>
+              </tr>
+              <tr class="sub-data" [ngClass]="{'showhide' : activePosition.value.isCollapsed}" *ngFor="let leg of activePosition.value.legs | keyvalue; let i = index">
+                <td class="text-center">
+                  <table>
+                     <tr>
+                        <td>{{i + 1}}</td>
+                     </tr>
+                  </table>
+                </td>
+                <td>
+                  <table>
+                     <tr>
+                      <td>{{leg.value.product}}</td>
+                     </tr>
+                  </table>
+                </td>
+                <td>
+                  <table>
+                     <tr>
+                      <td *ngIf="leg.value.direction === 'BUY'">LONG</td>
+                      <td *ngIf="leg.value.direction === 'SELL'">SHORT</td>
+                     </tr>
+                  </table>
+                </td>
+                <td>
+                  <table>
+                     <tr>
+                      <td>{{leg.value.dealSize}}</td>
+                     </tr>
+                  </table>
+                </td>
+                <td>
+                  <table>
+                     <tr>
+                      <td>{{leg.value.openingPrice | currency:leg.value.currency}}</td>
+                     </tr>
+                  </table>
+                </td>
+                <td>
+                  <table>
+                     <tr>
+                      <td>
+                        <span [ngClass]="{'red_number' : leg.value.unrealizedPNL < 0, 'green_number' : leg.value.unrealizedPNL > 0}">{{leg.value.unrealizedPNL | currency:leg.value.currency}}</span>
+                        <span [ngClass]="{'red_number' : leg.value.unrealizedPNLPct < 0, 'green_number' : leg.value.unrealizedPNLPct > 0}">({{leg.value.unrealizedPNLPct | percent:'1.2-2'}})</span> </td>
+                     </tr>
+                  </table>
+                </td>
+                <td>
+                  <table>
+                     <tr>
+                      <td>{{leg.value.right}}</td>
+                     </tr>
+                  </table>
+                </td>
+                <td>
+                  <table>
+                     <tr>
+                      <td>{{leg.value.expiry | optionExpiryDate}}</td>
+                     </tr>
+                  </table>
+                </td>
+                <td>
+                  <table>
+                     <tr>
+                      <td>{{leg.value.strike | currency:leg.value.currency}}</td>
+                     </tr>
+                  </table>
+                </td>
+                <td>
+                  <table>
+                     <tr>
+                      <td>{{leg.value.multiplier}}</td>
+                     </tr>
+                  </table>
+                </td>
+                <td>
+                  <table>
+                     <tr>
+                      <td>{{leg.value.entryTime | date: 'dd MMM yyyy, hh:mm:ss a' }}</td>
+                     </tr>
+                  </table>
+                </td>
+                <td>
+                  <table>
+                     <tr>
+                      <td></td>
+                     </tr>
+                  </table>
+                </td>
+                <td>
+                  <table>
+                     <tr>
+                      <td></td>
+                     </tr>
+                  </table>
+                </td>
+                <td>
+                  <table>
+                     <tr>
+                      <td></td>
+                     </tr>
+                  </table>
+                </td>
+              </tr>
+            </ng-container>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

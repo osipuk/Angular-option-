@@ -1,0 +1,138 @@
+<div class="sticky-top TopMenu">
+  <div class="TopMenuLft InnerBradcrumb">
+    <img src="//am708403.blob.core.windows.net/images/optionpi/img/logo.png"  class="mobLogo" style="width: 50px;">
+    <h1>{{bradcrumb.title}}</h1>
+    <p *ngIf="bradcrumb.subtitle !==''">{{bradcrumb.subtitle}}</p>
+    <ul *ngIf="bradcrumb.data.length > 0">
+      <li *ngFor="let bradcrumbObj of bradcrumb.data">
+        <a *ngIf="bradcrumbObj.navigation" [routerLink]="bradcrumbObj.navigation">{{bradcrumbObj.name}}</a>
+        <span *ngIf="!bradcrumbObj.navigation">{{bradcrumbObj.name}}</span>
+      </li>
+    </ul>
+  </div>
+  <div class="TopMenuRgt">
+    <ul>
+      <li>
+        <div class="Search">
+          <form>
+            <div class="input-group">
+              <i class="fa fa-magnifying-glass"></i>
+              <div class="togglesearch">
+                <!-- <input type="text" class="form-control" placeholder="Search" aria-label="" aria-describedby="basic-addon1"> -->
+                  <ng-select
+                    class="header-search"
+                    dropdownPosition="bottom"
+                    (change)="onProductSelected($event)"
+                    [items]="Products$ | async"
+                    [trackByFn]="searchProductTrackByFn"
+                    bindLabel="Symbol"
+                    [loading]="ProductSearchLoading"
+                    [(ngModel)]="SelectedProduct"
+                    [ngModelOptions]="{standalone: true}"
+                    placeholder="Search"
+                    [typeahead]="ProductInput$">
+                    <ng-template ng-option-tmp let-item="item" let-index="index">
+                      <div class="product-name">
+                        {{item.ProductName}}
+                      </div>
+                      <div class="product-symbol">
+                        <b>{{item.Symbol}}</b> [{{item.Currency}}]
+                      </div>
+                    </ng-template>
+                  </ng-select>
+                  <a class="mobSearchIcon">
+                    <i class="fa fa-magnifying-glass"></i>
+                  </a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </li>
+      <li>
+        <a class="support">
+          <img src="//am708403.blob.core.windows.net/images/optionpi/img/support.png">
+        </a>
+      </li>
+      <li>
+        <a class="bell">
+          <span class="NotificationShape"></span>
+          <img src="//am708403.blob.core.windows.net/images/optionpi/img/bell.png">
+        </a>
+      </li>
+      <li>
+        <a class="UserImg">
+          <img src="//am708403.blob.core.windows.net/images/optionpi/img/UserImg.png">
+        </a>
+      </li>
+      <!-- <li (click)="sidebar_show()"> -->
+      <li (click)="hamburgerDropdown()" class="hamburger-menubar">
+        <div class="menu-icon">
+          <button class="c-hamburger c-hamburger--htx nav_bar">
+            <span class="hamburger-button"></span>
+
+          </button>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div class="mobile-menubar shadow bg-body rounded accordion accordion-flush" id="MobileAccordion">
+    <div class="accordion-item">
+      <div class="accordion-header" id="Mainheader">
+        <button [routerLink]="['/dashboard']" class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#MainCollapse" aria-expanded="false" aria-controls="MainCollapse">
+          <img src="//am708403.blob.core.windows.net/images/optionpi/img/Icon.png" class="menuIcon ms-1 me-2">
+          Main
+        </button>
+      </div>
+      <div id="MainCollapse" class="accordion-collapse collapse" aria-labelledby="Mainheader" data-bs-parent="#MobileAccordion">
+        <div class="accordion-body">
+          <div class="mobile-menulist" (click)="selectTab('screener')">Screener</div>
+          <div class="mobile-menulist" (click)="selectTab('aiSignals')">A.I Signal</div>
+          <div class="mobile-menulist" (click)="selectTab('trade')">Trade</div>
+          <div class="mobile-menulist" (click)="selectTab('watchList')">Watchlist</div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <div class="accordion-header" id="AccountHeader">
+        <button [routerLink]="['/account']" class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#AccountCollapse" aria-expanded="false" aria-controls="AccountCollapse">
+          <img src="//am708403.blob.core.windows.net/images/optionpi/img/user.png" class="menuIcon me-2">
+          Account
+        </button>
+      </div>
+      <div id="AccountCollapse" class="accordion-collapse collapse" aria-labelledby="AccountHeader" data-bs-parent="#MobileAccordion">
+        <div class="accordion-body">
+          <div class="mobile-menulist">Screener</div>
+          <div class="mobile-menulist">Account</div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <div class="accordion-header" id="ChartHeader">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ChartCollapse" aria-expanded="false" aria-controls="ChartCollapse">
+          <img src="//am708403.blob.core.windows.net/images/optionpi/img/KebabChart.png" style="width:20px; height: 20px;" class="menuIcon me-2">
+          Chart
+        </button>
+      </div>
+      <div id="ChartCollapse" class="accordion-collapse collapse" aria-labelledby="ChartHeader" data-bs-parent="#MobileAccordion">
+        <div class="accordion-body">
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <div class="accordion-header" id="LeaernHeader">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#LearnCollapse" aria-expanded="false" aria-controls="LearnCollapse">
+          <img src="//am708403.blob.core.windows.net/images/optionpi/img/academic-cap.png" class="menuIcon me-2">
+          Learn
+        </button>
+      </div>
+      <div id="LearnCollapse" class="accordion-collapse collapse" aria-labelledby="LeaernHeader" data-bs-parent="#MobileAccordion">
+        <div class="accordion-body">
+        </div>
+      </div>
+    </div>
+    <div class="mobile-menulist ps-4" (click)="logoutUser()">
+      <img src="//am708403.blob.core.windows.net/images/optionpi/img/logout.png" class="me-2">
+      Log Out
+    </div>
+  </div>
+</div>

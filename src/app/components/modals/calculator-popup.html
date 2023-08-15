@@ -1,0 +1,205 @@
+<div class="modal-header">
+    <h3 class="mb-0">Calculator</h3>
+    <button type="button" class="btn-close" (click)="modal.dismiss('Cross click')" aria-label="Close"></button>
+</div>
+<div class="modal-body p-0">
+    <!-- <div class="AccountModal PlaceOrderModal CalculatorModal" id="Calculator" aria-hidden="true" tabindex="-1">
+        <div class="modal-content PlaceOrderContent"> -->
+            <!-- <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button> -->
+            <form [formGroup]="CalculatorFormGroup">
+                <div class="CalculatorTop">
+                    <div>
+                        <ul>
+                            <li>
+                                <span>Underlying</span>
+                                <p>{{CalculatorFormGroup.value.Symbol}}</p>
+                            </li>
+                            <li>
+                                <span>Option Contracts</span>
+                                <!-- <p>{{CalculatorFormGroup.value.OptionContract}}</p> -->
+                                <div class="text-center" style="width: 250px;">
+                                    <div style="color: #B39256;">
+                                        {{extractContract(CalculatorFormGroup.value.OptionContract)}}
+                                    </div>
+                                    <div style="font-size: 12px;">
+                                        {{extractDateAndValues(CalculatorFormGroup.value.OptionContract)}}
+                                    </div>
+                                </div>
+                                <div style="position: relative; cursor: pointer; line-height: 38px; margin-left: 10px; ">
+                                    <img src="//am708403.blob.core.windows.net/images/optionpi/img/Visualise.png" width="20px" height="20px" style="min-width: 20px;"
+                                        (mouseenter)="hoveredData = CalculatorFormGroup.value.OptionContract" (mouseleave)="hoveredData = null"
+                                    >
+                                    <div *ngIf="hoveredData === CalculatorFormGroup.value.OptionContract">
+                                        <app-custom-eye-hover [CalcData] ="CalcData" [index]= "1"></app-custom-eye-hover>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <ul>
+                            <li>
+                                <span>Strategy</span>
+                                <p>{{CalculatorFormGroup.value.Strategy}}</p>
+                            </li>
+                            <!-- <li>
+                                <span>Max Profit</span>
+                                <p>{{ CalculatorFormGroup.value.Strategy == "Straddle"? "undefined" :
+                                    "$"+(MaxProfitLoss$|async)?.MaxProfit}}</p>
+                            </li>
+                            <li>
+                                <span>Max Loss</span>
+                                <p>${{(MaxProfitLoss$|async)?.MaxLoss}}</p>
+                            </li> -->
+                        </ul>
+                    </div>
+                </div>
+                <div class="border-top" style="color: #5F6C85;">
+                    <div class="d-flex">
+                        <div class="w-100 border-end px-4 py-2">
+                            Max Profit : {{ CalculatorFormGroup.value.Strategy == "Straddle"? "undefined" :
+                            "$"+(MaxProfitLoss$|async)?.MaxProfit}}</div>
+                        <div class="w-100 px-4 py-2">Max Loss : ${{(MaxProfitLoss$|async)?.MaxLoss}}</div>
+                    </div>
+                    <div class="d-flex px-2 py-3 border-top">
+                        <div class="d-flex align-items-center w-100 ps-5" >
+                            <input (change)="payoffClicked($event)" id="payOff" name="CalculateRadioBtn" type="radio" checked="true" class="me-2">
+                            <label for="payOff">Calculate Payoff</label>
+                        </div>
+                        <div class="d-flex align-items-center w-100 ps-5" >
+                            <input (change)="valuationClicked($event)" id="valuation" name="CalculateRadioBtn" type="radio" class="me-2">
+                            <label for="valuation">Modal Valuation</label>
+                        </div>
+                    </div>
+                    <div class="px-4 py-2 border-top">
+                        <span>Capital : </span>
+                        <input value="{{ CalculatorFormGroup.value.Capital}}"
+                            (change)="capitalChange($event)" style="min-width: 70px;"
+                            name="capital" class="place-order-strategy-input"
+                            formControlName="Capital" contenteditable>
+                        USD
+                    </div>
+                </div>
+                <div class="CalculatorBtm">
+                    <div class="CalculatorLft" formGroupName="CurrentState">
+                        <h3>Current State</h3>
+                        <ul>
+                            <!-- <li *ngFor="let leg of CalculatorFormGroup.value.CurrentState.Legs">
+                                <span>Leg {{leg.LegId}} - Implied Volatility</span>
+                                <p>{{leg.IV | percent:'1.2-2'}}</p>
+                            </li> -->
+                            <li>
+                                <span>Stock Price</span>
+                                <p>{{CalculatorFormGroup.value.CurrentState.StockPrice | currency:'USD'}}</p>
+                            </li>
+                            <li>
+                                <span>ATM Mean IV</span>
+                                <p>{{CalculatorFormGroup.value.CurrentState.ATMMeanIV | percent:'1.2-2'}}</p>
+                            </li>
+                            <li>
+                                <span>Dividend Yield</span>
+                                <p>{{CalculatorFormGroup.value.CurrentState.DividendYield | percent:'1.2-2'}}</p>
+                            </li>
+                            <li>
+                                <span>Risk Free Rate</span>
+                                <p>{{CalculatorFormGroup.value.CurrentState.RiskFreeRate | percent:'1.2-2'}}</p>
+                            </li>
+                            <li>
+                                <span>Mean Skew</span>
+                                <p>{{CalculatorFormGroup.value.CurrentState.MeanSkew}}</p>
+                            </li>
+                            <li>
+                                <span>Days To Expiry</span>
+                                <p>{{CalculatorFormGroup.value.CurrentState.DaysToExpiry}}</p>
+                            </li>
+                        </ul>
+                        <div *ngIf="!DropDownClicked" class="BackBtn border-bottom-0">
+                            <a class="BtnDefault w-100" (click)="loadOptionModal()">Back</a>
+                            <!-- <a *ngIf="currentTradeTab === 'by-product'" class="BtnDefault w-100"
+                                data-bs-target="#PlaceOrder" data-bs-toggle="modal" data-bs-dismiss="modal">Back</a>
+                            <a *ngIf="currentTradeTab === 'by-strategy'" class="BtnDefault w-100"
+                                data-bs-target="#PlaceOrderStrategy" data-bs-toggle="modal"
+                                data-bs-dismiss="modal">Back</a> -->
+                        </div>
+                    </div>
+                    <div class="CalculatorRgt" formGroupName="NextState">
+                        <h3>Next State</h3>
+                        <div *ngIf="radioChecked == 'payOff'" class="CalculatorMidl">
+                            <table>
+                                <tr>
+                                    <td>ATM Mean IV</td>
+                                    <td>
+                                        <input  value="{{ CalculatorFormGroup.value.NextState.ATMMeanIV}}"
+                                            (change)="nextStateChange($event)"
+                                            name="atmMeanIV" class="place-order-strategy-input"
+                                            formControlName="ATMMeanIV" contenteditable> %
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Stock Price</td>
+                                    <td>
+                                        <input value="{{ CalculatorFormGroup.value.NextState.StockPrice}}"
+                                            (change)="nextStateChange($event)"
+                                            name="stockPrice" class="place-order-strategy-input"
+                                            formControlName="StockPrice" contenteditable>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Risk Free Rate</td>
+                                    <td>
+                                        <input value="{{CalculatorFormGroup.value.NextState.RiskFreeRate}}"
+                                            (change)="nextStateChange($event)"    
+                                            name="riskFreeRate" class="place-order-strategy-input"
+                                            formControlName="RiskFreeRate" contenteditable> %
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Dividend Yield</td>
+                                    <td>
+                                        <input value="{{CalculatorFormGroup.value.NextState.DividendYield}}"
+                                            (change)="nextStateChange($event)"    
+                                            name="divYield" class="place-order-strategy-input"
+                                            formControlName="DividendYield" contenteditable> %
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Days To Expiry</td>
+                                    <td>
+                                        <input value="{{CalculatorFormGroup.value.NextState.Period}}"
+                                            (change)="nextStateChange($event)"    
+                                            name="period" class="place-order-strategy-input"
+                                            formControlName="Period" contenteditable> days
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="ComputeBtn">
+                            <a class="BtnDefault w-100" (click)="computeProfitLoss()">Compute <img
+                                    src="//am708403.blob.core.windows.net/images/optionpi/img/beaker.png"></a>
+                        </div>
+                        <ul *ngIf="radioChecked == 'payOff'">
+                            <li style="color:#5F6C85">
+                                Profit/Loss
+                            </li>
+                            <li>
+                                <p [ngClass]="(ProfitLossResult$ | async)! > 0 ? 'SuccessTxt' : 'DangerTxt'">
+                                    ${{(ProfitLossResult$ | async)}}
+                                </p>
+                            </li>
+                        </ul>
+                        <ul *ngIf="radioChecked == 'valuation'" class="bg-white d-block">
+                            <li class="mb-4">
+                                Modal Valuation : <span class="text-primary">${{PriceGap$ | async}}</span>
+                            </li>
+                            <li>
+                                Current Price is 
+                                    <span class="text-primary" style="text-transform: initial">{{Valuation$ | async}}% {{compareItem}}</span> 
+                                than model valuation
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </form>
+        <!-- </div>
+    </div> -->
+</div>

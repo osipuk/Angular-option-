@@ -1,0 +1,55 @@
+<div class="modal-header">
+    <h3>Place Option Order</h3>
+    <button type="button" class="btn-close" (click)="modal.dismiss('Cross click')" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <!-- Confirm Order -->
+    <div class="AccountModal ConfirmOrderModal" id="ConfirmOptionOrder" aria-hidden="true" tabindex="-1">
+        <div class="modal-content">
+            <h4>This option order will be created</h4>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+                <table>
+                    <tr>
+                        <th>Action</th>
+                        <td>
+                            <span class="textHighlight">{{ConfirmedOptionOrder.action}}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Account</th>
+                        <td>{{ConfirmedOptionOrder.account}} ({{ConfirmedOptionOrder.broker}})</td>
+                    </tr>
+                    <tr>
+                        <th>Product</th>
+                        <td>{{ConfirmedOptionOrder.product}}</td>
+                    </tr>
+                    <tr>
+                        <th>Quantity</th>
+                        <td>{{ConfirmedOptionOrder.quantity}} {{ConfirmedOptionOrder.unitType}}</td>
+                    </tr>
+                    <tr>
+                        <th>Order Type</th>
+                        <td>{{ConfirmedOptionOrder.orderType}}</td>
+                    </tr>
+                    <tr>
+                        <th>Limit Price</th>
+                        <td>US$ {{ConfirmedOptionOrder.limitPrice}}</td>
+                    </tr>
+                    <tr>
+                        <th>Validity</th>
+                        <td>{{ConfirmedOptionOrder.validity}}</td>
+                    </tr>
+                </table>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="BtnSecondary" data-bs-target="#PlaceOrder" data-bs-toggle="modal"
+        data-bs-dismiss="modal">
+        <i class="bi bi-arrow-left"></i> Previous </button>
+    <button class="BtnDefault" (click)="confirmSendOptionOrder()" data-bs-toggle="modal"
+        data-bs-dismiss="modal">Submit
+        <i class="bi bi-cart"></i>
+    </button>
+</div>

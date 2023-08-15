@@ -1,0 +1,186 @@
+<!-- Modal start -->
+<!-- Strategy Success Order -->
+<div class="modal fade AccountModal OrderCreatedModal StrategyOrderSuccess" id="OrderSuccess" aria-hidden="true" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-body">
+        <h4>Order Created! </h4>
+        <div>
+          <img src="//am708403.blob.core.windows.net/images/optionpi/img/checked.png">
+          <p class="PriceLine">
+            <strong>{{StrategyOrderSuccessParameter.Strategy}} # {{StrategyOrderSuccessParameter.Underlying}},</strong> Underlying Price = {{(StockData$ | async)?.LastTradedPrice | currency:'USD'}}
+          </p>
+          <p>Your order has been successfully placed</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="BtnDefault w-100" (click)="seeMyOrders()">See My Order </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Strategy Order Rejected #StrategyOrderRejected-->
+<div class="modal fade AccountModal OrderRejectModal StrategyOrderRejectedModal" id="StrategyOrderRejected" aria-hidden="true" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-body">
+        <h4>Order rejected!</h4>
+        <div>
+          <img src="//am708403.blob.core.windows.net/images/optionpi/img/cancel.png">
+          <p class="PriceLine">
+            <strong>{{StrategyOrderRejectedParameter.Strategy}} # {{StrategyOrderRejectedParameter.Underlying}},</strong> Underlying Price = {{(StockData$ | async)?.LastTradedPrice | currency:'USD'}}
+          </p>
+          <p>Your order has been rejected for following reason:
+            <span class="text-alert">{{StrategyOrderRejectedParameter.RejectReason}}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Order Created -->
+<div class="modal fade AccountModal OrderCreatedModal" id="OrderCreated" aria-hidden="true" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-body">
+        <h4>Order Created! </h4>
+        <div>
+          <img src="//am708403.blob.core.windows.net/images/optionpi/img/checked.png">
+          <h5>{{OrderSuccessParameter.Action}} {{OrderSuccessParameter.Quantity}} {{OrderSuccessParameter.Symbol}}
+            <span *ngIf="OrderSuccessParameter.OrderType === 'Limit'">@ {{OrderSuccessParameter.LimitPrice}}</span>
+            <span *ngIf="OrderSuccessParameter.OrderType === 'Stop'">@ {{OrderSuccessParameter.StopPrice}}</span>
+          </h5>
+          <p>Your order has been successfully placed</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="BtnDefault w-100" (click)="seeMyOrders()">See My Order </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Order Rejected -->
+<div class="modal fade AccountModal OrderRejectModal" id="OrderRejected" aria-hidden="true" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-body">
+        <h4>Order rejected!</h4>
+        <div>
+          <img src="//am708403.blob.core.windows.net/images/optionpi/img/cancel.png">
+          <h5>{{OrderRejectedParameter.Action}} {{OrderRejectedParameter.Quantity}} {{OrderRejectedParameter.Symbol}}
+            <span *ngIf="OrderRejectedParameter.OrderType === 'Limit'">@ {{OrderRejectedParameter.LimitPrice}}</span>
+            <span *ngIf="OrderRejectedParameter.OrderType === 'Stop'">@ {{OrderRejectedParameter.StopPrice}}</span>
+          </h5>
+          <p>Your order has been rejected for following reason:
+            <span class="text-alert">{{OrderRejectedParameter.RejectReason}}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal Ends -->
+
+<div class="tab-pane fade show active" id="trade" role="tabpanel" aria-labelledby="trade-tab">
+  <div class="TradeHead">
+    <h3>Filter</h3>
+  </div>
+  <!-- Trade Filter Bar -->
+  <div class="TradeFilterBar OptionContentLftTop">
+    <div class="OptionContentFilter1">
+      <form>
+        <div class="form-control">
+          <label>Broker</label>
+          <select (ngModelChange)='onBrokerTypeChanged($event)'
+          [(ngModel)]="SelectedBroker" [ngModelOptions]="{standalone: true}" class="form-select selectDefault" aria-label="Default select example" id="SelectType">
+            <option *ngFor="let brokerType of brokerTypes" [ngValue]="brokerType">
+              {{ brokerType.name }}
+            </option>
+          </select>
+        </div>
+        <div class="form-control">
+          <label>Account</label>
+          <select (ngModelChange)='onAccountChanged($event)'
+          [(ngModel)]="SelectedBrokerAccount" [ngModelOptions]="{standalone: true}" class="form-select selectDefault" aria-label="Default select example">
+            <option *ngFor="let brokerAccount of brokerAccounts" [ngValue]="brokerAccount">
+              {{ brokerAccount.id }}
+            </option>
+          </select>
+        </div>
+      </form>
+    </div>
+    <div class="OptionContentFilter2">
+      <a class="BtnSecondary" data-bs-toggle="modal" href="#LiquidateAllModal">Liquidate All <img src="//am708403.blob.core.windows.net/images/optionpi/img/cash.png"></a>
+      <a class="BtnDefault" data-bs-toggle="modal" (click)="preselectAccount()" href="#PlaceOrder">Options Chain <i class="bi bi-cart3"></i></a>
+    </div>
+  </div>
+  <!-- Liquidate All Confirmation -->
+  <div class="modal fade AccountModal ConfirmOrderModal" id="LiquidateAllModal" aria-hidden="true" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-body">
+          <h4>Liquidate All</h4>
+          <div>
+            Are you sure you want to liquidate all current positions?
+          </div>
+          <div>
+            Please double check your current positions as this action cannot be undone
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="BtnDefault" (click)="confirmLiquidateAll()" data-bs-toggle="modal"
+            data-bs-dismiss="modal">Liquidate All</button>
+          <button class="BtnSecondary" data-bs-toggle="modal"
+            data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Trade Account Tab -->
+  <div class="TradeAccountTabMain">
+    <ul class="nav nav-tabs DashboardTab" id="myTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button [ngClass]="{'active' : currentTab === 'account-summary'}" class="nav-link" id="AccountSummary-tab"
+          type="button" (click)="setTab('account-summary')" aria-selected="true">Account Summary</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button [ngClass]="{'active' : currentTab === 'active-position'}" class="nav-link" type="button"
+          (click)="setTab('active-position')" aria-selected="true">Active Positions</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button [ngClass]="{'active' : currentTab === 'active-orders'}" class="nav-link" type="button"
+          (click)="setTab('active-orders')" aria-selected="true">Active Orders</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button [ngClass]="{'active' : currentTab === 'historical-transactions'}" class="nav-link" type="button"
+          (click)="setTab('historical-transactions')" aria-selected="true">Historical Transactions</button>
+      </li>
+    </ul>
+    <div class="tab-content DashboardTabContent TradTabContent" id="myTabContent">
+      <!-- Account Summary -->
+      <div *ngIf="currentTab === 'account-summary'">
+        <ow-main-trade-accountsummary-tab [SelectedBrokerAccount]="SelectedBrokerAccount"></ow-main-trade-accountsummary-tab>
+      </div>
+      <!-- Active Positions -->
+      <div *ngIf="currentTab === 'active-position'">
+        <ow-main-trade-activepositions-tab [SelectedBrokerAccount]="SelectedBrokerAccount"></ow-main-trade-activepositions-tab>
+      </div>
+      <!-- Active Orders -->
+      <div *ngIf="currentTab === 'active-orders'">
+        <ow-main-trade-activeorders-tab [SelectedBrokerAccount]="SelectedBrokerAccount"></ow-main-trade-activeorders-tab>
+      </div>
+      <!-- <div class="tab-pane fade" id="ActiveOrder" role="tabpanel" aria-labelledby="ActiveOrder-tab">...</div> -->
+      <!-- Historical Transactions -->
+      <div *ngIf="currentTab === 'historical-transactions'">
+        <ow-main-trade-historicaltransactions-tab [SelectedBrokerAccount]="SelectedBrokerAccount"></ow-main-trade-historicaltransactions-tab>
+      </div>
+      <!-- <div class="tab-pane fade" id="HistoricalTransaction" role="tabpanel" aria-labelledby="HistoricalTransaction-tab">...</div> -->
+    </div>
+  </div>
+</div>
+

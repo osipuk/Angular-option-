@@ -1,0 +1,645 @@
+<!-- Modal start -->
+
+<!-- Add WatchList-->
+<div class="modal fade AccountModal PlaceOrderModal responsiveModal" id="AddContract" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content PlaceOrderContent" style="width:100%">
+      <button type="button" (click)="mobileAddContractBtn()" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      <h3>Add Contracts</h3>
+      <!-- Modal Content Start -->
+      <div class="PlaceOrderTabPannel">
+        <div class="tab-content PlaceOrderTabContent1" id="PlaceTabContent">
+          <!-- Product List-->
+          <div class="tab-pane fade show active ProductListContent" id="ProductList" role="tabpanel" aria-labelledby="ProductList-tab">
+            <div class="ProductListContentTop">
+              <div class="OptionContentFilter1 padding">
+                <form>
+                  <div class="form-control d-block ">
+                    <div class="text-black-60 pb-2">Strategy</div>
+                    <div class="d-flex">
+                      <select 
+                        (change)="onSelectedStrategyChanged()"
+                        [(ngModel)]="SelectedStrategy" [ngModelOptions]="{standalone: true}"
+                        class="form-select selectDefault DateSelect" aria-label="">
+                        <option *ngFor="let strategy of StrategyList" [ngValue]="strategy">
+                          {{ strategy.Display }}
+                        </option>
+                      </select>
+                      <div class="d-flex align-items-center ms-3">
+                        <!-- <i class="fa fa-magnifying-glass" style="font-size: 18px; color: #B39256;"></i> -->
+                        <ng-select
+                          style="width: 200px; "
+                          dropdownPosition="bottom"
+                          (change)="onProductSelected($event)"
+                          [items]="Products$ | async"
+                          [trackByFn]="searchProductTrackByFn"
+                          bindLabel="Symbol"
+                          [loading]="ProductSearchLoading"
+                          [(ngModel)]="SelectedProduct"
+                          [ngModelOptions]="{standalone: true}"
+                          placeholder="Type to Search"
+                          [typeahead]="ProductInput$">
+                          <ng-template ng-option-tmp let-item="item" let-index="index" style="width: 200px;">
+                            <div class="product-name">
+                              {{item.ProductName}}
+                            </div>
+                            <div class="product-symbol">
+                              <b>{{item.Symbol}}</b> [{{item.Currency}}]
+                            </div>
+                          </ng-template>
+                        </ng-select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-control d-block">
+                    <div class="text-black-60 pb-2">Expiry Date</div>
+                      <select 
+                        (ngModelChange)='onExpiryDateChanged($event)' 
+                        [(ngModel)]="SelectedOptionExpiryDate" 
+                        [ngModelOptions]="{standalone: true}"
+                        class="form-select selectDefault DateSelect"
+                        style="height: 42px;"
+                        aria-label=""
+                      >
+                        <option *ngFor="let expiryDate of (OptionExpiryDates$ | async)?.ExpiryDates" [ngValue]="expiryDate">
+                          {{ expiryDate }}
+                        </option>
+                      </select>
+                  </div>
+                </form>
+              </div>
+              <div *ngIf="!SelectedProduct" class="tab-content OptionStockContent" id="OptionStockContent">
+                <!-- Option Content -->
+                <div [ngClass]="{'active' : currentProductListTab === 'product-list-option'}"
+                  class="tab-pane fade show" id="Option" role="tabpanel" aria-labelledby="Option-tab">
+                  <div style="width: 900px;height:550px;text-align:center;transform: translateY(25%);">Please select product by typing on Symbol field</div>
+                </div>
+              </div>
+              <div *ngIf="SelectedProduct" class="tab-content OptionStockContent" id="OptionStockContent">
+                <!-- Option Content -->
+                <div [ngClass]="{'active' : currentProductListTab === 'product-list-option'}"
+                  class="tab-pane fade show" id="Option" role="tabpanel" aria-labelledby="Option-tab">
+                  <div class="OptionContentMain">
+                    <!-- Option Left Pannel -->
+                    <div class="OptionContentLft" style="width:900px">
+                      <div class="OptionContentLftBtm">
+                        <app-loading [status]="isLoading"></app-loading>
+                        <div class="d-flex flex-wrap fixedTable">
+                          <div [ngClass]="OptionTable4Classes">
+                            <aside class="fixedTable-sidebar table4" #table4ScrollElement
+                              (scroll)="scrollTable4Handler($event)">
+                              <table *ngIf="!isLoading" class="table selectTable text-center myTable4" id="myTable4"
+                                [ngStyle]="dynamicStyleTable4">
+                                <thead>
+                                  <tr class="callHead">
+                                    <th rowspan="2" class="NonClick">Strike Price</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr *ngFor="let snapshoot of OptionSnapshotData">
+                                    <td class="NonClick">{{snapshoot.StrikePrice}}</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </aside>
+                          </div>
+                          <div [ngClass]="OptionTable1Classes">
+                            <div class="fixedTable-body table1" #table1ScrollElement
+                              (scroll)="scrollTable1Handler($event)">
+                              <table *ngIf="!isLoading" class="table selectTable text-center myTable1" id="myTable1"
+                                [ngStyle]="dynamicStyleTable1">
+                                <thead>
+                                  <tr class="callHead">
+                                    <ng-container *ngFor="let callTableColumn of callTableColumns">
+                                      <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn(callTableColumn.key)">{{callTableColumn.label}}</th>
+                                    </ng-container>
+                                  </tr>
+                                  <tr class="callHead">
+                                    <th colspan="6">Call</th>
+                                  </tr>
+                                </thead>
+                                <tbody style="width: 100%; float: left;">
+                                  <tr (click)="setSelectedPlaceOrderRowCall(snapshoot)"
+                                    [ngClass]="{ 'Highlight' : snapshoot.Call.isSelected !== undefined && snapshoot.Call.isSelected, 'callBG': (snapshoot.StrikePrice < placeOrderLastTradedPrice) }"
+                                    *ngFor="let snapshoot of OptionSnapshotData; let i = index;">
+                                      <ng-container *ngFor="let callTableColumn of callTableColumns">
+                                        <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn(callTableColumn.key)">{{checkValueByKey(snapshoot.Call, callTableColumn)}}</td>
+                                      </ng-container>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                          <div [ngClass]="OptionTable2Classes">
+                            <aside class="fixedTable-sidebar table2" #table2ScrollElement
+                              (scroll)="scrollTable2Handler($event)">
+                              <table *ngIf="!isLoading" class="table selectTable text-center myTable2" id="myTable2"
+                                [ngStyle]="dynamicStyleTable2">
+                                <thead>
+                                  <tr class="callHead">
+                                    <th rowspan="2" class="NonClick">Strike Price</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr
+                                    [ngClass]="{ 'Highlight' : (snapshoot.Call.isSelected !== undefined && snapshoot.Call.isSelected || snapshoot.Put.isSelected !== undefined && snapshoot.Put.isSelected) }"
+                                    *ngFor="let snapshoot of OptionSnapshotData">
+                                    <td class="NonClick">{{snapshoot.StrikePrice}}</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </aside>
+                          </div>
+                          <div [ngClass]="OptionTable3Classes">
+                            <div class="fixedTable-body table3" #table3ScrollElement
+                              (scroll)="scrollTable3Handler($event)">
+                              <table *ngIf="!isLoading" class="table selectTable text-center myTable3" id="myTable3"
+                                [ngStyle]="dynamicStyleTable3">
+                                <thead>
+                                  <tr class="putHead">
+                                    <ng-container *ngFor="let putTableColumn of putTableColumns">
+                                      <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn(putTableColumn.key)">{{putTableColumn.label}}</th>
+                                    </ng-container>
+                                  </tr>
+                                  <tr class="putHead">
+                                    <th colspan="6">Put</th>
+                                  </tr>
+                                </thead>
+                                <tbody style="width: 100%; float: left;">
+                                  <tr (click)="setSelectedPlaceOrderRowPut(snapshoot)"
+                                    [ngClass]="{ 'Highlight' : snapshoot.Put.isSelected !== undefined && snapshoot.Put.isSelected, 'putBG': (snapshoot.StrikePrice > placeOrderLastTradedPrice) }"
+                                    *ngFor="let snapshoot of OptionSnapshotData; let i = index;">
+                                      <ng-container *ngFor="let putTableColumn of putTableColumns">
+                                        <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn(putTableColumn.key)">{{checkValueByKey(snapshoot.Put, putTableColumn)}}</td>
+                                      </ng-container>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex justify-content-between" style="width: inherit; padding: 25px 35px;">
+          <div class="d-flex flex-column" style="gap: 35px;">
+            <div>
+              <span style="color: #667085;">C1</span>
+              <span style="color: #ccd0d5; font-family: cursive;">: {{OptionContractList[0]}}</span>
+            </div>
+            <div *ngIf="LegNumOfSelectedStrategy >2">
+              <span style="color: #667085;">C3</span>
+              <span style="color: #ccd0d5; font-family: cursive;">: {{OptionContractList[2]}}</span>
+            </div>
+          </div>
+          <div class="d-flex flex-column" style="gap: 35px;">          
+            <div>
+              <span style="color: #667085;">C2</span>
+              <span style="color: #ccd0d5; font-family: cursive;">: {{OptionContractList[1]}}</span>
+            </div>
+            <div *ngIf="LegNumOfSelectedStrategy >2">
+              <span style="color: #667085;">C4</span>
+              <span style="color: #ccd0d5; font-family: cursive;">: {{OptionContractList[3]}}</span>
+            </div>
+          </div>            
+          <div class="align-content-center BtnFilter">
+            <button class="BtnDefault" style="height: 35px; margin-bottom: 15px;" (click)="onClickConfirmBtn()"> 
+              <img src="//am708403.blob.core.windows.net/images/optionpi/img/check.png" style="width: 22px; height: 20px;">Confirm
+            </button>
+            <button class="BtnSecondary disable" style="height: 35px;" (click)="onClickClearAllBtn()">
+              <img src="//am708403.blob.core.windows.net/images/optionpi/img/trash.png" style="width: 20px; height: 20px;">Clear All
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Modal Content End -->
+    </div>
+  </div>
+</div>
+
+<!-- Validation Error -->
+<div class="modal fade AccountModal ConfirmOrderModal" id="LegsValidation" aria-hidden="true" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered" style="height: 500px;">
+    <div class="modal-content">
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-body">
+          <div class="align-self-center">
+            <h4 style="color: #B39256;">Validation Error(S)</h4>
+          </div>
+          <div class="lh-base fs-5">
+            {{ErrorMessage}}.
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button class="BtnDefault align-self-end w-100" data-bs-close="modal"
+          data-bs-dismiss="modal">Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal Ends -->
+
+<div class="tab-pane fade show active " id="watchList" role="tabpanel" aria-labelledby="watchList-tab">
+  <div class="tab-content watchListTabsContent" id="myTabContent">
+     
+    <div style="position: relative;">
+      <div class="d-flex" style="position: absolute; right:15px; bottom:25px">
+        <a class="AddWatchListBtn" (click)="onClickAddContractBtn()" href="#AddContract" data-bs-toggle="modal">
+          <img src="//am708403.blob.core.windows.net/images/optionpi/img/Add Button.png" style="width: 20px; height: 20px;">Add
+        </a>
+        <a class="BtnSecondary disable" (click)="generateWatchListresult()">
+          <img src="//am708403.blob.core.windows.net/images/optionpi/img/reload.png" style="width: 20px; height: 20px;">Refresh
+        </a>
+      </div>
+    </div>
+
+    <div class="PredefinedScreeningTop WatchlistHead">
+      <span>Watchlist</span>
+    </div>
+    <div class="PredefinedScreeningBtm" style="margin-bottom: 25px">
+      <div class="table-responsive ScreenerTable" style="overflow: auto; width: 100%; height: 650px;">
+        <app-loading [status]="isLoadingScreenerResult"></app-loading>
+        <table *ngIf="!isLoadingScreenerResult" class="table table-striped">
+          <thead *ngIf="GetWatchListDataResult.Data.length != 0">
+            <tr style="height: 60px;">
+              <th class="col-md-1"
+                (click)="sortColumns('Strategy', currentSortedColumn.type === 'Desc' ? 'Asc' : 'Desc')">Strategy
+                <a *ngIf="currentSortedColumn.name === 'Strategy'">
+                  <i class="fa"
+                    [ngClass]="{'fa-arrow-up' : currentSortedColumn.type === 'Asc', 'fa-arrow-down' : currentSortedColumn.type === 'Desc'}"></i>
+                </a>
+              </th>
+              <th class="col-md-1"
+                (click)="sortColumns('Underlying', currentSortedColumn.type === 'Desc' ? 'Asc' : 'Desc')">Underlying Symbol
+                <a *ngIf="currentSortedColumn.name === 'Underlying'">
+                  <i class="fa"
+                    [ngClass]="{'fa-arrow-up' : currentSortedColumn.type === 'Asc', 'fa-arrow-down' : currentSortedColumn.type === 'Desc'}"></i>
+                </a>
+              </th>
+              <th class="col-md-1"
+                (click)="sortColumns('Name', currentSortedColumn.type === 'Desc' ? 'Asc' : 'Desc')">Name
+                <a *ngIf="currentSortedColumn.name === 'Name'">
+                  <i class="fa"
+                    [ngClass]="{'fa-arrow-up' : currentSortedColumn.type === 'Asc', 'fa-arrow-down' : currentSortedColumn.type === 'Desc'}"></i>
+                </a>
+              </th>
+              <th class="col-md-2"
+                (click)="sortColumns('OptionContracts', currentSortedColumn.type === 'Desc' ? 'Asc' : 'Desc')">Options Contract
+                <a *ngIf="currentSortedColumn.name === 'OptionContracts'">
+                  <i class="fa"
+                    [ngClass]="{'fa-arrow-up' : currentSortedColumn.type === 'Asc', 'fa-arrow-down' : currentSortedColumn.type === 'Desc'}"></i>
+                </a>
+              </th>
+              <th class="col-md-1"
+                (click)="sortColumns('BidBundlePrice', currentSortedColumn.type === 'Desc' ? 'Asc' : 'Desc')">Bid
+                <a *ngIf="currentSortedColumn.name === 'BidBundlePrice'">
+                  <i class="fa"
+                    [ngClass]="{'fa-arrow-up' : currentSortedColumn.type === 'Asc', 'fa-arrow-down' : currentSortedColumn.type === 'Desc'}"></i>
+                </a>
+              </th>
+              <th class="col-md-1"
+              (click)="sortColumns('AskBundlePrice', currentSortedColumn.type === 'Desc' ? 'Asc' : 'Desc')">Ask
+                <a *ngIf="currentSortedColumn.name === 'AskBundlePrice'">
+                  <i class="fa"
+                    [ngClass]="{'fa-arrow-up' : currentSortedColumn.type === 'Asc', 'fa-arrow-down' : currentSortedColumn.type === 'Desc'}"></i>
+                </a>
+              </th>
+              <th class="col-md-1"
+              (click)="sortColumns('LastBundlePrice', currentSortedColumn.type === 'Desc' ? 'Asc' : 'Desc')">Last
+                <a *ngIf="currentSortedColumn.name === 'LastBundlePrice'">
+                  <i class="fa"
+                    [ngClass]="{'fa-arrow-up' : currentSortedColumn.type === 'Asc', 'fa-arrow-down' : currentSortedColumn.type === 'Desc'}"></i>
+                </a>
+              </th>
+              <th class="col-md-1"
+              (click)="sortColumns('LastUnderlyingPrice', currentSortedColumn.type === 'Desc' ? 'Asc' : 'Desc')">Underlying Price
+                <a *ngIf="currentSortedColumn.name === 'LastUnderlyingPrice'">
+                  <i class="fa"
+                    [ngClass]="{'fa-arrow-up' : currentSortedColumn.type === 'Asc', 'fa-arrow-down' : currentSortedColumn.type === 'Desc'}"></i>
+                </a>
+              </th>
+              <th class="col-md-1"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="GetWatchListDataResult.Data.length === 0">
+              <td colspan="9">There is currently no entries available</td>
+            </tr>
+            <ng-container *ngIf="GetWatchListDataResult.Data">
+              <tr *ngFor="let watch of GetWatchListDataResult.Data; let i = index">
+                <td style="color: #667085;">{{watch.Strategy}}</td>
+                <td style="color: #b39256;">{{watch.Underlying}}</td>
+                <td>
+                  <span *ngIf="watch.Name">{{watch.Name}}</span>
+                  <span *ngIf="watch.Name == null">-</span>
+                </td>
+                <td class="d-flex flex-row justify-content-between">
+                  <div>
+                    <div style="color: #B39256;">
+                      {{extractContract(watch)}}
+                    </div>
+                    <div style="font-size: 12px;">
+                      {{extractDateAndValues(watch)}}
+                    </div>
+                  </div>
+                  <div style="position: relative; cursor: pointer; line-height: 38px; margin-left: 10px;">
+                    <img src="//am708403.blob.core.windows.net/images/optionpi/img/Visualise.png" width="20px" height="20px" style="min-width:20px"
+                    (mouseenter)="hoveredData = watch" (mouseleave)="hoveredData = null"
+                      >
+                    <div *ngIf="hoveredData === watch">
+                      <app-custom-eye-hover [Watch] ="watch" [index]= "i"></app-custom-eye-hover>
+                    </div>
+                  </div>
+                </td>
+                <td>{{watch.BidBundlePrice}}</td>
+                <td>{{watch.AskBundlePrice}}</td>
+                <td>{{watch.LastBundlePrice}}</td>
+                <td>{{watch.LastUnderlyingPrice}}</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div style="margin-right: 15px;">
+                      <a class="DeleteBtn" (click)="onClickDelBtn(watch)" style="padding:10px 15px">
+                        <img src="//am708403.blob.core.windows.net/images/optionpi/img/Delete.png" style="width: 15px; height: 15px;">Delete
+                      </a>
+                    </div>
+                    <div style="position: relative;">
+                      <ul>
+                        <li class="d-flex align-items-center">
+                          <a class="PlaceOrder" (click)="loadOptionModal(watch.Underlying, watch.Strategy, watch.OptionContracts)">
+                            Place Order
+                          </a>
+                          <app-custom-dropdown [item]="'watchlist'" [data] = "watch"  [SelectedStrategy]="watch.Strategy"></app-custom-dropdown>
+                        </li>
+                      </ul>
+                      <div class="rectangle" style="left: -115px !important; top:-26px !important; height:90px !important"></div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+        <div class="mobileScreenerTable" *ngIf="!isLoadingScreenerResult">
+          <ng-container *ngIf="GetWatchListDataResult.Data.length != 0">
+            <div *ngFor="let Watch of GetWatchListDataResult.Data, let i = index">
+              <div style="padding:15px 0 15px 14px; ">
+                <div class="d-flex justify-content-between align-items-center">
+                  {{Watch.Strategy}}
+                  <app-custom-dropdown [item]="'watchlist'" [data] = "Watch" [SelectedStrategy]="Watch.Strategy"></app-custom-dropdown>
+                </div>
+                <div class="d-flex justify-content-between" style="color:#B39256">
+                  <span>{{Watch.Underlying}}</span>
+                  <span style="color:#63be68; margin-right: 25px;">
+                    {{Watch.LastUnderlyingPrice | currency:'USD'}}
+                  </span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center" style="padding:0 14px">
+                  <div>
+                    <span style="font-weight: 500;">
+                      {{extractContract(Watch)}}
+                    </span>
+                    <span style="font-size: 12px;">
+                      {{extractDateAndValues(Watch)}}
+                    </span>
+                  </div>
+                  <div style="position: relative; cursor: pointer; line-height: 38px; margin-right: 10px;">
+                    <!-- <i (mouseenter)="hoveredData = Watch" (mouseleave)="hoveredData = null" class="fa fa-light fa-eye"></i> -->
+                    <img src="//am708403.blob.core.windows.net/images/optionpi/img/Visualise.png" width="20px" height="20px" style="min-width:20px"
+                    (mouseenter)="hoveredData = Watch" (mouseleave)="hoveredData = null"
+                    >
+                    <div *ngIf="hoveredData === Watch">
+                      <app-custom-eye-hover [Watch] ="Watch" [index]= "i"></app-custom-eye-hover>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="border-bottom:1px solid #dee2e6">
+                <div class="d-flex justify-content-between p-2" style="background-color:#F8F9FC;">
+                  <span>Bid: {{Watch.BidBundlePrice | currency:'USD'}}</span>
+                  <span>Ask: {{Watch.AskBundlePrice | currency:'USD'}}</span>
+                  <span>Last: {{Watch.LastBundlePrice | currency:'USD'}}</span>
+                </div>
+                <div class="d-flex padding" >
+                  <div class="col-6" style="margin-right: 15px;">
+                    <a class="DeleteBtn" (click)="onClickDelBtn(Watch)">
+                      <img src="//am708403.blob.core.windows.net/images/optionpi/img/Delete.png" style="width: 15px; height: 15px;">
+                      Delete
+                    </a>
+                  </div>
+                  <ul class="col-6">
+                    <li class="text-center" style="margin-right:20px; ">
+                      <a class="mobilePlaceOrder" (click)="loadOptionModal(Watch.Underlying, Watch.Strategy, Watch.OptionContracts)" style="padding:10px 15px">
+                        Place Order
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="GetWatchListDataResult.Data.length == 0">
+            <div class="mobileEmptyTable">There is currently no entries available</div>
+          </ng-container>
+        </div>
+      </div>
+      <nav *ngIf="!isLoadingScreenerResult && GetWatchListDataResult.TotalData > 10" aria-label="..." class="ScreenerPagination">
+        <ul class="pagination">
+          <li class="page-item" (click)="IsFirstPage ? null :previousPage()" [ngClass] = {disabled:IsFirstPage}>
+            <a class="page-link">
+              <i class="fa fa-arrow-left"></i>
+              <span>Previous</span>
+            </a>
+          </li>
+          <li class="d-flex">
+            <ul>
+              <li *ngFor="let pageNum of Pages" class="page-item" [ngClass]="{active: CurrentPage===pageNum}">
+                <span class="page-link" (click)="goToPage(pageNum)">{{pageNum}}</span>
+              </li>
+            </ul>
+            <span class="mobPagination">Page {{CurrentPage}} of {{TotalPage}}</span>
+          </li>
+          <li class="page-item" (click)="IsLastPage ? null :nextPage()" [ngClass] = {disabled:IsLastPage}>
+            <a class="page-link">
+              <span>Next</span>
+              <i class="fa fa-arrow-right"></i>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+    <div class="mobileAddContractList shadow-sm" *ngIf="showMobileAddContractList">
+      <div class="mobileAnalysisFilterHeader" (click)="onBackButtonClick()" style="width: 100%; padding: 10px 15px; ">
+        <button type="button" class="BtnSecondary" >Back</button>
+      </div>
+      <div class="mobileAddContractListHeader">
+        <h3>Add Contracts</h3>
+      </div>
+      <div class="OptionContentFilter1 bg-white p-4 mb-2">
+        <form class="flex-row w-100">
+          <div class="form-control d-block w-100">
+            <div class="text-black-60 pb-2">Strategy</div>
+            <select 
+              (change)="onSelectedStrategyChanged()"
+              [(ngModel)]="SelectedStrategy" [ngModelOptions]="{standalone: true}"
+              class="form-select selectDefault DateSelect w-100" aria-label="">
+              <option *ngFor="let strategy of StrategyList" [ngValue]="strategy">
+                {{ strategy.Display }}
+              </option>
+            </select>
+          </div>
+          <div class="form-control d-block w-100">
+            <!-- <i class="fa fa-magnifying-glass" style="font-size: 18px; color: #B39256;"></i> -->
+            <ng-select
+              dropdownPosition="bottom"
+              (change)="onProductSelected($event)"
+              [items]="Products$ | async"
+              [trackByFn]="searchProductTrackByFn"
+              bindLabel="Symbol"
+              [loading]="ProductSearchLoading"
+              [(ngModel)]="SelectedProduct"
+              [ngModelOptions]="{standalone: true}"
+              placeholder="Type to Search"
+              [typeahead]="ProductInput$">
+              <ng-template ng-option-tmp let-item="item" let-index="index" style="width: 200px;">
+                <div class="product-name">
+                  {{item.ProductName}}
+                </div>
+                <div class="product-symbol">
+                  <b>{{item.Symbol}}</b> [{{item.Currency}}]
+                </div>
+              </ng-template>
+            </ng-select>
+          </div>
+          <div class="form-control d-block w-100">
+            <div class="text-black-60 pb-2">Expiry Date</div>
+              <select 
+                (ngModelChange)='onExpiryDateChanged($event)' 
+                [(ngModel)]="SelectedOptionExpiryDate" 
+                [ngModelOptions]="{standalone: true}"
+                class="form-select selectDefault DateSelect w-100"
+                aria-label=""
+              >
+                <option *ngFor="let expiryDate of (OptionExpiryDates$ | async)?.ExpiryDates" [ngValue]="expiryDate">
+                  {{ expiryDate }}
+                </option>
+              </select>
+          </div>
+        </form>
+      </div>
+      <div class="mobileOptionTable">
+        <div class="mobileAddContractListHeader">
+          <h3>Select Contract</h3>
+        </div>
+        <div class="OptionContentLftBtm" >
+          <app-loading [status]="isLoading"></app-loading>
+          <div class="d-flex fixedTable bg-white" style="height:400px;">
+            <div class="fixedTable-body table1 d-flex w-100">
+              <table *ngIf="!isLoading" class="table selectTable text-center myTable1" id="myTable1"
+                [ngStyle]="dynamicStyleTable1">
+                <thead *ngIf="SelectedProduct">
+                  <tr class="callHead">
+                    <ng-container *ngFor="let callTableColumn of callTableColumns">
+                      <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn(callTableColumn.key)">{{callTableColumn.label}}</th>
+                    </ng-container>
+                  </tr>
+                  <tr class="callHead">
+                    <th colspan="6">Call</th>
+                  </tr>
+                </thead>
+                <tbody style="width: 100%; float: left;" *ngIf="SelectedProduct">
+                  <tr (click)="setSelectedPlaceOrderRowCall(snapshoot)"
+                    [ngClass]="{ 'Highlight' : snapshoot.Call.isSelected !== undefined && snapshoot.Call.isSelected, 'callBG': (snapshoot.StrikePrice < placeOrderLastTradedPrice) }"
+                    *ngFor="let snapshoot of OptionSnapshotData; let i = index;">
+                      <ng-container *ngFor="let callTableColumn of callTableColumns">
+                        <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn(callTableColumn.key)">{{checkValueByKey(snapshoot.Call, callTableColumn)}}</td>
+                      </ng-container>
+                  </tr>
+                </tbody>
+              </table>
+              <table *ngIf="!isLoading" class="table selectTable text-center myTable2" id="myTable2" 
+                [ngStyle]="dynamicStyleTable2" style="height: max-content;">
+                <thead *ngIf="SelectedProduct">
+                  <tr class="callHead">
+                    <th rowspan="2" class="NonClick">Strike Price</th>
+                  </tr>
+                </thead>
+                <tbody *ngIf="SelectedProduct">
+                  <tr
+                    [ngClass]="{ 'Highlight' : (snapshoot.Call.isSelected !== undefined && snapshoot.Call.isSelected || snapshoot.Put.isSelected !== undefined && snapshoot.Put.isSelected) }"
+                    *ngFor="let snapshoot of OptionSnapshotData">
+                    <td class="NonClick">{{snapshoot.StrikePrice}}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <table *ngIf="!isLoading" class="table selectTable text-center myTable3" id="myTable3"
+              [ngStyle]="dynamicStyleTable3">
+                <thead *ngIf="SelectedProduct">
+                  <tr class="putHead">
+                    <ng-container *ngFor="let putTableColumn of putTableColumns">
+                      <th *ngIf="placeOrderColumns.length > 0 && getStatusByColumn(putTableColumn.key)">{{putTableColumn.label}}</th>
+                    </ng-container>
+                  </tr>
+                  <tr class="putHead">
+                    <th colspan="6">Put</th>
+                  </tr>
+                </thead>
+                <tbody style="width: 100%; float: left;" *ngIf="SelectedProduct">
+                  <tr (click)="setSelectedPlaceOrderRowPut(snapshoot)"
+                    [ngClass]="{ 'Highlight' : snapshoot.Put.isSelected !== undefined && snapshoot.Put.isSelected, 'putBG': (snapshoot.StrikePrice > placeOrderLastTradedPrice) }"
+                    *ngFor="let snapshoot of OptionSnapshotData; let i = index;">
+                      <ng-container *ngFor="let putTableColumn of putTableColumns">
+                        <td *ngIf="placeOrderColumns.length > 0 && getStatusByColumn(putTableColumn.key)">{{checkValueByKey(snapshoot.Put, putTableColumn)}}</td>
+                      </ng-container>
+                  </tr>
+                <!-- </tbody> -->
+              </table>
+            </div>
+          </div>
+          <div class="d-flex flex-column p-3" style="gap:20px">
+            <div class="align-self-center">
+              <span style="color: #667085;">C1</span>
+              <span style="color: #ccd0d5; font-family: cursive;">: {{OptionContractList[0]}}</span>
+            </div>
+            <div class="align-self-center">
+              <span style="color: #667085;">C2</span>
+              <span style="color: #ccd0d5; font-family: cursive;">: {{OptionContractList[1]}}</span>
+            </div>
+            <div *ngIf="LegNumOfSelectedStrategy >2" class="align-self-center">
+              <span style="color: #667085;">C3</span>
+              <span style="color: #ccd0d5; font-family: cursive;">: {{OptionContractList[2]}}</span>
+            </div>      
+            <div *ngIf="LegNumOfSelectedStrategy >2" class="align-self-center">
+              <span style="color: #667085;">C4</span>
+              <span style="color: #ccd0d5; font-family: cursive;">: {{OptionContractList[3]}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mobileFilterIcon">
+        <button class="BtnSecondary disable w-100 rounded-0 py-4" style="height: 35px;" (click)="onClickClearAllBtn()">
+          <img src="//am708403.blob.core.windows.net/images/optionpi/img/trash.png" style="width: 20px; height: 20px;">Clear All
+        </button>
+        <button class="BtnDefault w-100 rounded-0 py-4" style="height: 35px; " (click)="onClickConfirmBtn()"> 
+          <img src="//am708403.blob.core.windows.net/images/optionpi/img/check.png" style="width: 22px; height: 20px;">Confirm
+        </button>
+      </div>
+    </div>
+    <div class="mobileFilterIcon mt-4" *ngIf="!showMobileAddContractList">
+
+      <button class="BtnSecondary disable w-100 rounded-0" style="height: 35px; padding:20px 14px;" (click)="generateWatchListresult()">
+        <img src="//am708403.blob.core.windows.net/images/optionpi/img/reload.png" style="width: 20px; height: 20px;">Refresh
+      </button>
+      <button class="BtnDefault w-100 rounded-0" style="height: 35px; padding:20px 14px;" (click)="mobileAddContractBtn()"> 
+        <img src="//am708403.blob.core.windows.net/images/optionpi/img/Add Button.png" style="width: 22px; height: 20px;">Add
+      </button>
+    </div>
+  </div>
+</div>
+
+<ow-analytics-tab></ow-analytics-tab>

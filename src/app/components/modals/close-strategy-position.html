@@ -1,0 +1,312 @@
+<div class="modal-header">
+    <h3>Close Position</h3>
+    <button type="button" class="btn-close" (click)="modal.dismiss('Cross click')" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <!-- Place Order Strategy Templete -->
+    <div class="AccountModal PlaceOrderModal" id="CloseStrategy" aria-hidden="true" data-bs-backdrop="static"
+        data-bs-keyboard="false" tabindex="-1">
+        <div class="modal-content PlaceOrderContent">
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+            <!-- Modal Content Start -->
+            <div class="PlaceOrderTabPannel StrategyMain">
+                <div class="StrategyLft">
+                    <div class="StrategyLftTop">
+                    </div>
+                    <div class="StrategyLftBtm">
+                        <form class="w-100 SideBarForm" [formGroup]="ByStrategyForm">
+                            <div class="form-control w-100">
+                                <label>Strategy</label>
+                                <div>{{StrategyPositionToClose.Strategy}}</div>
+                            </div>
+                            <div class="form-control w-100">
+                                <label>Stock</label>
+                                <!-- <input formControlName="SelectedStock" type="text" name="stock" placeholder="Choose Stock" class="w-100"> -->
+                                <div>
+                                    {{ StrategyPositionToClose.Product }}
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="StrategyRgt">
+                    <div class="StrategyRgtTop">
+                        <p><strong>{{StrategyPositionToClose.Strategy}} #
+                                {{StrategyPositionToClose.Product}},</strong> Underlying Price = {{(StockData$ |
+                            async)?.LastTradedPrice | currency:'USD'}}</p>
+                    </div>
+                    <div class="StrategyRgtBtm">
+                        <form class="w-100 SideBarForm" [formGroup]="ByStrategyForm"
+                            (ngSubmit)="submitStrategyOrder()">
+                            <div class="StrategyForm">
+                                <div class="form-control">
+                                    <label>Amount</label>
+                                    <input formControlName="Amount" type="text" name="amount">
+                                </div>
+                                <div class="form-control">
+                                    <label>Type</label>
+                                    <div>
+                                        Limit
+                                    </div>
+                                    <!-- <select class="form-select selectDefault w-100" aria-label="">
+                        <option selected="">Limit</option>
+                        <option value="1">Limit</option>
+                    </select> -->
+                                </div>
+                                <div class="form-control">
+                                    <label>Validity</label>
+                                    <div>Day</div>
+                                    <!-- <div class="radioDefault">
+                        <label>
+                        <input type="radio" name="radio" />
+                        GTC
+                        </label>
+                        <label>
+                        <input type="radio" name="radio" checked />
+                        Day
+                        </label>
+                    </div> -->
+                                </div>
+                                <div class="form-control">
+                                    <label>&nbsp;</label>
+                                    <div class="d-flex" style="margin-top: -4px;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="StrategyTable">
+                                <div class="table-responsive">
+                                    <table class="table table-striped" formArrayName="Legs">
+                                        <tbody>
+                                            <tr class="HighlightTableStripted">
+                                                <td colspan="6">Option Contract</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Action</th>
+                                                <th>Option</th>
+                                                <th>Qty</th>
+                                                <th>SP</th>
+                                                <th>Expiry</th>
+                                                <!-- <th>Price</th> -->
+                                                <th
+                                                    *ngIf="ByStrategyForm.value.SelectedStrategy?.Name === 'IronCondor'">
+                                                </th>
+                                                <th
+                                                    *ngIf="ByStrategyForm.value.SelectedStrategy?.Name !== 'IronCondor'">
+                                                    Fair Value</th>
+                                            </tr>
+                                            <ng-container
+                                                *ngFor="let Leg of ByStrategyForm.value.Legs;let i = index;">
+                                                <tr *ngIf="Leg">
+                                                    <ng-container [formGroupName]="i">
+                                                        <td>
+                                                            <p>{{Leg.Direction}}</p>
+                                                        </td>
+                                                        <td>{{Leg.Rights}}</td>
+                                                        <td>{{Leg.Quantity}}</td>
+                                                        <td>{{Leg.StrikePrice}}</td>
+                                                        <td>{{Leg.Expiry}}</td>
+                                                        <!-- <td><input class="place-order-strategy-input" type="text" name="LimitPrice"
+                                value="{{Leg.LimitPrice}}" formControlName="LimitPrice"></td> -->
+                                                        <td
+                                                            *ngIf="ByStrategyForm.value.SelectedStrategy?.Name === 'IronCondor'">
+                                                        </td>
+                                                        <td
+                                                            *ngIf="ByStrategyForm.value.SelectedStrategy?.Name !== 'IronCondor'">
+                                                            {{Leg.FairValue}}</td>
+                                                    </ng-container>
+                                                </tr>
+                                            </ng-container>
+                                        </tbody>
+                                    </table>
+                                    <table class="table table-striped"
+                                        *ngIf="StrategyPositionToClose.Strategy === 'DeltaNeutral'">
+                                        <tbody>
+                                            <tr class="HighlightTableStripted">
+                                                <td colspan="6">Stock</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Action</th>
+                                                <th></th>
+                                                <th>Qty</th>
+                                                <th></th>
+                                                <th></th>
+                                                <!-- <th></th> -->
+                                                <th>Price</th>
+                                            </tr>
+                                            <tr>
+                                                <td>{{ByStrategyForm.value.Direction}}</td>
+                                                <td></td>
+                                                <td>{{ByStrategyForm.value.Quantity}}</td>
+                                                <td></td>
+                                                <td></td>
+                                                <!-- <td><span class="input" role="textbox" contenteditable>{{ByStrategyForm.value.LimitPrice}}</span></td> -->
+                                                <td>{{ByStrategyForm.value.LimitPrice}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="w-100 SubmitBlock">
+                                <div *ngIf="ByStrategyForm.value.SelectedStrategy?.Name === 'IronCondor'"
+                                    class="w-25 d-flex" style="float: left;text-align: left;">
+                                    <label style="margin-top: 12px;">Bundle Price:
+                                        {{getIronCondorBundlePrice()}}</label>
+                                </div>
+                                <div class="w-100 d-flex" style="float: right;text-align: right;">
+                                    <label style="margin-top: 12px;margin-right: 20px;">Account</label>
+                                    <div>{{SelectedBrokerAccount.id}} ({{SelectedBrokerAccount.brokerType}})</div>
+                                </div>
+                                <button style="margin-left: 20px;" class="BtnDefault" type="submit"
+                                    data-bs-target="#ConfirmCloseStrategyOrder" data-bs-toggle="modal"
+                                    data-bs-dismiss="modal">Submit <i class="bi bi-cart3"></i></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- <div class="StrategyRgt EmptyParameter">
+            <div class="PayoffLftBtm h-100">
+                <div class="configure">
+                    <img src="//am708403.blob.core.windows.net/images/optionpi/img/settings.png">
+                    <h2>Please configure the parameter </h2>
+                    <p>Please configure the parameter and select the value to show the graph</p>
+                </div>
+            </div>
+            </div> -->
+            </div>
+            <!-- Modal Content End -->
+        </div>
+    </div>
+</div>
+
+<!-- Strategy Confrim Order -->
+<div class="modal fade AccountModal PlaceOrderModal StrategyConfrimOrderModal" id="ConfirmCloseStrategyOrder"
+  aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content PlaceOrderContent">
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      <h3>This order will be created</h3>
+      <!-- Modal Content Start -->
+      <div class="PlaceOrderTabPannel StrategyMain">
+        <div class="StrategyRgt">
+          <div class="StrategyRgtTop" style="width: 100%; float: left;">
+            <div style="width: 60%; float: left;">
+            <p><strong>{{ConfirmedStrategyOrder.strategy}} # {{ConfirmedStrategyOrder.symbol}},</strong> Underlying
+              Price = {{(StockData$ | async)?.LastTradedPrice | number}}</p>
+            </div>
+            <div style="width: 40%; float: right; text-align: right;">
+              <p>Account: <span style="color: #B39256;font-weight: bold;">{{ConfirmedStrategyOrder.account}} ({{ConfirmedStrategyOrder.broker}})</span></p>
+            </div>
+          </div>
+          <div class="StrategyRgtBtm">
+            <form class="w-100 SideBarForm">
+              <div class="StrategyTable">
+                <div class="table-responsive">
+                  <table class="table table-striped">
+                    <tbody>
+                      <tr class="HighlightTableStripted">
+                        <td colspan="6">Option Contract</td>
+                      </tr>
+                      <tr>
+                        <th>Action</th>
+                        <th>Option</th>
+                        <th>Qty</th>
+                        <th>SP</th>
+                        <th>Expiry</th>
+                        <!-- <th>Price</th> -->
+                        <th *ngIf="ByStrategyForm.value.SelectedStrategy?.Name === 'IronCondor'"></th>
+                        <th *ngIf="ByStrategyForm.value.SelectedStrategy?.Name !== 'IronCondor'">Fair Value</th>                        
+                      </tr>
+                      <tr *ngIf="ConfirmedStrategyOrder.legs[0]">
+                        <td>
+                          <p>{{ConfirmedStrategyOrder.legs[0].Direction}}</p>
+                        </td>
+                        <td>{{ConfirmedStrategyOrder.legs[0].Rights}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[0].Quantity}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[0].StrikePrice}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[0].Expiry}}</td>
+                        <!-- <td>{{ConfirmedStrategyOrder.legs[0].LimitPrice}}</td> -->
+                        <th *ngIf="ByStrategyForm.value.SelectedStrategy?.Name === 'IronCondor'"></th>
+                        <th *ngIf="ByStrategyForm.value.SelectedStrategy?.Name !== 'IronCondor'">{{ConfirmedStrategyOrder.legs[0].FairValue}}</th>
+                      </tr>
+                      <tr *ngIf="ConfirmedStrategyOrder.legs[1]">
+                        <td>
+                          <p>{{ConfirmedStrategyOrder.legs[1].Direction}}</p>
+                        </td>
+                        <td>{{ConfirmedStrategyOrder.legs[1].Rights}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[1].Quantity}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[1].StrikePrice}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[1].Expiry}}</td>
+                        <!-- <td>{{ConfirmedStrategyOrder.legs[1].LimitPrice}}</td> -->
+                        <th *ngIf="ByStrategyForm.value.SelectedStrategy?.Name === 'IronCondor'"></th>
+                        <th *ngIf="ByStrategyForm.value.SelectedStrategy?.Name !== 'IronCondor'">{{ConfirmedStrategyOrder.legs[1].FairValue}}</th>
+                      </tr>
+                      <tr *ngIf="ConfirmedStrategyOrder.legs[2]">
+                        <td>
+                          <p>{{ConfirmedStrategyOrder.legs[2].Direction}}</p>
+                        </td>
+                        <td>{{ConfirmedStrategyOrder.legs[2].Rights}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[2].Quantity}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[2].StrikePrice}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[2].Expiry}}</td>
+                        <!-- <td>{{ConfirmedStrategyOrder.legs[2].LimitPrice}}</td> -->
+                        <th *ngIf="ByStrategyForm.value.SelectedStrategy?.Name === 'IronCondor'"></th>
+                        <th *ngIf="ByStrategyForm.value.SelectedStrategy?.Name !== 'IronCondor'">{{ConfirmedStrategyOrder.legs[2].FairValue}}</th>
+                      </tr>
+                      <tr *ngIf="ConfirmedStrategyOrder.legs[3]">
+                        <td>
+                          <p>{{ConfirmedStrategyOrder.legs[3].Direction}}</p>
+                        </td>
+                        <td>{{ConfirmedStrategyOrder.legs[3].Rights}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[3].Quantity}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[3].StrikePrice}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[3].Expiry}}</td>
+                        <!-- <td>{{ConfirmedStrategyOrder.legs[3].LimitPrice}}</td> -->
+                        <th *ngIf="ByStrategyForm.value.SelectedStrategy?.Name === 'IronCondor'"></th>
+                        <th *ngIf="ByStrategyForm.value.SelectedStrategy?.Name !== 'IronCondor'">{{ConfirmedStrategyOrder.legs[3].FairValue}}</th>
+                      </tr>
+                    </tbody>
+                    <tbody *ngIf="ConfirmedStrategyOrder.strategy === 'DeltaNeutral'">
+                      <tr class="HighlightTableStripted">
+                        <td colspan="7">Stock</td>
+                      </tr>
+                      <tr>
+                        <th>Action</th>
+                        <th></th>
+                        <th>Qty</th>
+                        <th></th>
+                        <th></th>
+                        <!-- <th></th> -->
+                        <th>Price</th>
+                      </tr>
+                      <tr>
+                        <td>{{ConfirmedStrategyOrder.direction}}</td>
+                        <td></td>
+                        <td>{{ConfirmedStrategyOrder.quantity}}</td>
+                        <td></td>
+                        <td></td>
+                        <!-- <td></td> -->
+                        <td>{{ConfirmedStrategyOrder.limitPrice}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="w-100 SubmitBlock">
+        <div *ngIf="ByStrategyForm.value.SelectedStrategy?.Name === 'IronCondor'" class="w-25 d-flex" 
+          style="float: left;text-align: left;">
+          <label style="margin-top: 12px;">Bundle Price: {{getIronCondorBundlePrice()}}</label>
+        </div>
+        <a class="BtnSecondary" data-bs-target="#CloseStrategy" data-bs-toggle="modal" data-bs-dismiss="modal"><i
+            class="bi bi-arrow-left"></i> Previous</a>
+        <a class="BtnDefault" data-bs-target="#OrderSuccess" data-bs-toggle="modal" data-bs-dismiss="modal"
+          (click)="confirmSendStrategyOrder()">Submit <i class="bi bi-cart3"></i></a>
+      </div>
+      <!-- Modal Content End -->
+    </div>
+  </div>
+</div>

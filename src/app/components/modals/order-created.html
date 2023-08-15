@@ -1,0 +1,23 @@
+<!-- Order Created -->
+<div class="modal fade AccountModal OrderCreatedModal" id="OrderCreated" aria-hidden="true" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-body">
+          <h4>Order Created! </h4>
+          <div>
+            <img src="//am708403.blob.core.windows.net/images/optionpi/img/checked.png">
+            <h5>{{OrderSuccessParameter.Action}} {{OrderSuccessParameter.Quantity}} {{OrderSuccessParameter.Symbol}}
+              <span *ngIf="OrderSuccessParameter.OrderType === 'Limit'">@ {{OrderSuccessParameter.LimitPrice}}</span>
+              <span *ngIf="OrderSuccessParameter.OrderType === 'Stop'">@ {{OrderSuccessParameter.StopPrice}}</span>
+            </h5>
+            <p>Your order has been successfully placed</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="BtnDefault w-100" (click)="seeMyOrders()">See My Order </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  

@@ -1,0 +1,34 @@
+<div class="modal fade" id="customModal" tabindex="-1" role="dialog" aria-labelledby="customModalLabel" aria-hidden="true" style="background-color: #3e3e3f;" data-bs-backdrop-opacity="0.5">
+    <div class="modal-dialog modal-dialog-centered d-flex justify-content-center" role="document">
+        <div class="modal-content radius" style="border-radius: 25px; width: 300px; overflow: hidden; min-height:0">
+            <div class="modal-body px-0 pb-0">
+                <div *ngIf="displayNumber === 0">
+                    <div class="d-flex" *ngFor="let analysisFilter of AnalysisList">
+                        <div class="list-item" (click)="onClickFilterName(analysisFilter.id)">
+                            {{analysisFilter.name}}
+                            <i class="fa fa-arrow-circle-o-right float-end"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="displayNumber === 1">
+                    <div *ngFor="let item of individualItems">
+                        <div class="list-item"  >
+                            <label class="w-100" for="{{item.name}}">{{item.name}}</label>
+                            <input 
+                                (click)="addAnalysisFilter(item.name, item.value, item.group)"
+                                id="{{item.name}}" 
+                                class="custom-radio" 
+                                type="checkbox"
+                                name="filterName" 
+                                [checked]="checkStatus(item.name)"
+                            />
+                        </div>
+                    </div>
+                    <div (click)="setPrimaryBtn()" class="list-item text-white justify-content-center" style="background-color: #AE8F4D;">Back</div>
+                </div>
+                <div *ngIf="displayNumber === 0" (click)="closeModal()" class="list-item text-white justify-content-center" style="background-color: #AE8F4D;">Back</div>
+            </div>
+        </div>
+    </div>
+</div>

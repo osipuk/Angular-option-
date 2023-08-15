@@ -1,0 +1,65 @@
+table {
+  position: absolute;
+  background-color: white;
+  left: 10px;
+  z-index: 99990;
+  border-radius: 5px;
+  padding: 20px;
+  table-layout: fixed;
+}
+
+table.bottom {
+  bottom: 30px;
+  top: unset;
+}
+
+.PlaceOrderTable{
+  position: absolute;
+  /* background-color: white; */
+  left: -225px;
+  z-index: 99990;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+@media only screen and (min-width:501px) and (max-width:1024px) {
+  table{
+    position: absolute;
+    /* background-color: white; */
+    left: -400px;
+    z-index: 99990;
+    border-radius: 5px;
+    padding: 10px;
+  }
+}
+
+@media (max-width:500px) {
+  table{
+    position: absolute;
+    /* background-color: white; */
+    left: -300px;
+    z-index: 99990;
+    border-radius: 5px;
+    padding: 10px;
+  }
+
+  table td, th {
+    padding: 10px 14px;
+  }
+
+  table td:first-child {
+    min-width: 150px;
+    word-break: break-all;
+    white-space: pre-wrap;
+    text-align: start;
+  }
+
+  .PlaceOrderTable{
+    position: absolute;
+    /* background-color: white; */
+    left: -175px;
+    z-index: 99990;
+    border-radius: 5px;
+    padding: 10px;
+  }
+}

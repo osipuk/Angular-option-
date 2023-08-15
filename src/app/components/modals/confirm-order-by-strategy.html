@@ -1,0 +1,138 @@
+<div class="modal-header">
+  <h3>This order will be created</h3>
+  <button type="button" class="btn-close" (click)="modal.dismiss('Cross click')" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+  <!-- Strategy Confrim Order -->
+  <div class="AccountModal PlaceOrderModal StrategyConfrimOrderModal" id="StrategyConfrimOrder" aria-hidden="true"
+    data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="PlaceOrderContent">
+      <!-- Modal Content Start -->
+      <div class="PlaceOrderTabPannel StrategyMain">
+        <div class="StrategyRgt">
+          <div class="StrategyRgtTop" style="width: 100%; float: left;">
+            <div style="width: 60%; float: left;">
+              <p><strong>{{ConfirmedStrategyOrder.strategy}} # {{ConfirmedStrategyOrder.symbol}},</strong> Underlying
+                Price = {{(StockData$ | async)?.LastTradedPrice | number}}</p>
+            </div>
+            <div style="width: 40%; float: right; text-align: right;">
+              <p>Account: <span style="color: #B39256;font-weight: bold;">{{ConfirmedStrategyOrder.account}}
+                  ({{ConfirmedStrategyOrder.broker}})</span></p>
+            </div>
+          </div>
+          <div class="StrategyRgtBtm">
+            <form class="w-100 SideBarForm">
+              <div class="StrategyTable">
+                <div class="table-responsive">
+                  <table class="table table-striped">
+                    <tbody>
+                      <tr class="HighlightTableStripted">
+                        <td colspan="6">Option Contract</td>
+                      </tr>
+                      <tr>
+                        <th>Action</th>
+                        <th>Option</th>
+                        <th>Qty</th>
+                        <th>SP</th>
+                        <th>Expiry</th>
+                        <!-- <th>Price</th> -->
+                        <th *ngIf="ConfirmedStrategyOrder.strategy === 'IronCondor'"></th>
+                        <th *ngIf="ConfirmedStrategyOrder.strategy !== 'IronCondor'">Fair Value</th>
+                      </tr>
+                      <tr *ngIf="ConfirmedStrategyOrder.legs[0]">
+                        <td>
+                          <p>{{ConfirmedStrategyOrder.legs[0].Direction}}</p>
+                        </td>
+                        <td>{{ConfirmedStrategyOrder.legs[0].Rights}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[0].Quantity}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[0].StrikePrice}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[0].Expiry}}</td>
+                        <!-- <td>{{ConfirmedStrategyOrder.legs[0].LimitPrice}}</td> -->
+                        <th *ngIf="ConfirmedStrategyOrder.strategy === 'IronCondor'"></th>
+                        <th *ngIf="ConfirmedStrategyOrder.strategy !== 'IronCondor'">
+                          {{ConfirmedStrategyOrder.legs[0].FairValue}}</th>
+                      </tr>
+                      <tr *ngIf="ConfirmedStrategyOrder.legs[1]">
+                        <td>
+                          <p>{{ConfirmedStrategyOrder.legs[1].Direction}}</p>
+                        </td>
+                        <td>{{ConfirmedStrategyOrder.legs[1].Rights}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[1].Quantity}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[1].StrikePrice}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[1].Expiry}}</td>
+                        <!-- <td>{{ConfirmedStrategyOrder.legs[1].LimitPrice}}</td> -->
+                        <th *ngIf="ConfirmedStrategyOrder.strategy === 'IronCondor'"></th>
+                        <th *ngIf="ConfirmedStrategyOrder.strategy !== 'IronCondor'">
+                          {{ConfirmedStrategyOrder.legs[1].FairValue}}</th>
+                      </tr>
+                      <tr *ngIf="ConfirmedStrategyOrder.legs[2]">
+                        <td>
+                          <p>{{ConfirmedStrategyOrder.legs[2].Direction}}</p>
+                        </td>
+                        <td>{{ConfirmedStrategyOrder.legs[2].Rights}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[2].Quantity}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[2].StrikePrice}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[2].Expiry}}</td>
+                        <!-- <td>{{ConfirmedStrategyOrder.legs[2].LimitPrice}}</td> -->
+                        <th *ngIf="ConfirmedStrategyOrder.strategy === 'IronCondor'"></th>
+                        <th *ngIf="ConfirmedStrategyOrder.strategy !== 'IronCondor'">
+                          {{ConfirmedStrategyOrder.legs[2].FairValue}}</th>
+                      </tr>
+                      <tr *ngIf="ConfirmedStrategyOrder.legs[3]">
+                        <td>
+                          <p>{{ConfirmedStrategyOrder.legs[3].Direction}}</p>
+                        </td>
+                        <td>{{ConfirmedStrategyOrder.legs[3].Rights}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[3].Quantity}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[3].StrikePrice}}</td>
+                        <td>{{ConfirmedStrategyOrder.legs[3].Expiry}}</td>
+                        <!-- <td>{{ConfirmedStrategyOrder.legs[3].LimitPrice}}</td> -->
+                        <th *ngIf="ConfirmedStrategyOrder.strategy === 'IronCondor'"></th>
+                        <th *ngIf="ConfirmedStrategyOrder.strategy !== 'IronCondor'">
+                          {{ConfirmedStrategyOrder.legs[3].FairValue}}</th>
+                      </tr>
+                    </tbody>
+                    <tbody *ngIf="ConfirmedStrategyOrder.strategy === 'DeltaNeutral'">
+                      <tr class="HighlightTableStripted">
+                        <td colspan="6">Stock</td>
+                      </tr>
+                      <tr>
+                        <th>Action</th>
+                        <th></th>
+                        <th>Qty</th>
+                        <th></th>
+                        <th></th>
+                        <!-- <th></th> -->
+                        <th>Price</th>
+                      </tr>
+                      <tr>
+                        <td>{{ConfirmedStrategyOrder.direction}}</td>
+                        <td></td>
+                        <td>{{ConfirmedStrategyOrder.quantity}}</td>
+                        <td></td>
+                        <td></td>
+                        <!-- <td></td> -->
+                        <td>{{ConfirmedStrategyOrder.limitPrice}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="w-100 SubmitBlock">
+        <div *ngIf="ConfirmedStrategyOrder.strategy === 'IronCondor'" class="d-flex"
+          style="float: left;text-align: left;">
+          <label style="margin-top: 12px;">Bundle Price: {{getIronCondorBundlePrice()}}</label>
+        </div>
+        <a class="BtnSecondary" data-bs-target="#PlaceOrderStrategy" data-bs-toggle="modal" data-bs-dismiss="modal"
+          (click)="loadOptionModal()"><i class="bi bi-arrow-left"></i> Previous</a>
+        <a class="BtnDefault" data-bs-target="#OrderSuccess" data-bs-toggle="modal" data-bs-dismiss="modal"
+          (click)="confirmSendStrategyOrder()">Submit <i class="bi bi-cart3"></i></a>
+      </div>
+      <!-- Modal Content End -->
+    </div>
+  </div>
+</div>

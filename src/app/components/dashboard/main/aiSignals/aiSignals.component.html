@@ -1,0 +1,165 @@
+<div class="tab-pane fade show active " id="aiSignals" role="tabpanel" aria-labelledby="aiSignals-tab">
+  
+  <div class="tab-content iSignalsTabsContent" id="myTabContent">
+    <!-- A.I Signals Contents -->
+      <div class="PredefinedScreeningTop AiSignalsHead">
+        <span>A.I Signals</span>
+      </div>
+
+      <div class="PredefinedScreeningBtm">
+        <div class="table-responsive ScreenerTable" style="overflow: auto; width: 100%; height: 650px;">
+          <app-loading [status]="isLoadingScreenerResult"></app-loading>
+          <table *ngIf="!isLoadingScreenerResult" class="table table-striped">
+            <thead>
+              <tr>
+                <th class="col-md-1"
+                  (click)="sortColumns('Strategy', currentSortedColumn.type === 'Desc' ? 'Asc' : 'Desc')">Strategy
+                  <a *ngIf="currentSortedColumn.name === 'Strategy'">
+                    <i class="fa"
+                      [ngClass]="{'fa-arrow-up' : currentSortedColumn.type === 'Asc', 'fa-arrow-down' : currentSortedColumn.type === 'Desc'}"></i>
+                  </a>
+                </th>
+                <th class="col-md-1"
+                  (click)="sortColumns('Symbol', currentSortedColumn.type === 'Desc' ? 'Asc' : 'Desc')">Symbol
+                  <a *ngIf="currentSortedColumn.name === 'Symbol'">
+                    <i class="fa"
+                      [ngClass]="{'fa-arrow-up' : currentSortedColumn.type === 'Asc', 'fa-arrow-down' : currentSortedColumn.type === 'Desc'}"></i>
+                  </a>
+                </th>
+                <th class="col-md-1"
+                  (click)="sortColumns('Name', currentSortedColumn.type === 'Desc' ? 'Asc' : 'Desc')">Name
+                  <a *ngIf="currentSortedColumn.name === 'Name'">
+                    <i class="fa"
+                      [ngClass]="{'fa-arrow-up' : currentSortedColumn.type === 'Asc', 'fa-arrow-down' : currentSortedColumn.type === 'Desc'}"></i>
+                  </a>
+                </th>
+                <th class="col-md-1"
+                  (click)="sortColumns('Options Contract', currentSortedColumn.type === 'Desc' ? 'Asc' : 'Desc')">Options Contract
+                  <a *ngIf="currentSortedColumn.name === 'Options Contract'">
+                    <i class="fa"
+                      [ngClass]="{'fa-arrow-up' : currentSortedColumn.type === 'Asc', 'fa-arrow-down' : currentSortedColumn.type === 'Desc'}"></i>
+                  </a>
+                </th>
+                <th class="col-md-2"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="PaginationData.length == 0">
+                <td colspan="8">There is currently no entries available</td>
+              </tr>
+              <ng-container *ngIf="PaginationData">
+                <tr *ngFor="let AiSignal of PaginationData; let i = index">
+                  <td style="color: #667085;">{{AiSignal.Strategy}}</td>
+                  <td style="color: #b39256;">{{AiSignal.Underlying}}</td>
+                  <td>{{AiSignal.Name}}</td>
+                  <td class="d-flex flex-row justify-content-between"
+                  style="padding: 26px;">
+                    <div>
+                      <div style="color: #B39256;">
+                        {{extractContract(AiSignal)}}
+                      </div>
+                      <div style="font-size: 12px;">
+                        {{extractDateAndValues(AiSignal)}}
+                      </div>
+                    </div>
+                    <div style="position: relative; cursor: pointer; line-height: 38px; margin-left: 10px;">
+                      <!-- <i (mouseenter)="hoveredData = AiSignal" (mouseleave)="hoveredData = null" class="fa fa-light fa-eye"></i> -->
+                      <img src="//am708403.blob.core.windows.net/images/optionpi/img/Visualise.png" width="20px" height="20px" style="min-width:20px"
+                      (mouseenter)="hoveredData = AiSignal" (mouseleave)="hoveredData = null"
+                       >
+                      <div *ngIf="hoveredData === AiSignal">
+                        <app-custom-eye-hover [AiSignal] ="AiSignal" [index]= "i"></app-custom-eye-hover>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <ul>
+                      <li class="d-flex align-items-center">
+                        <a class="PlaceOrder" (click)="loadOptionModal(AiSignal.Underlying, AiSignal.Strategy, AiSignal.OptionContracts)">
+                          Place Order
+                        </a>
+                        <app-custom-dropdown [item]="'aiSignals'" [data]="AiSignal" [SelectedStrategy]="AiSignal.Strategy"></app-custom-dropdown>
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+          <div class="mobileScreenerTable" *ngIf="!isLoadingScreenerResult">
+            <ng-container *ngIf="PaginationData.length != 0">
+              <div *ngFor="let AiSignal of PaginationData, let i = index">
+                <div style="padding:15px 0 15px 14px; border-bottom:1px solid #dee2e6">
+                  <div class="d-flex justify-content-between align-items-center">
+                    {{AiSignal.Strategy}}
+                    <app-custom-dropdown [item]="'aiSignals'" [data]="AiSignal" [SelectedStrategy]="AiSignal.Strategy"></app-custom-dropdown>
+                  </div>
+                  <div style="color:#B39256">
+                    {{AiSignal.Underlying}}
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <span style="font-weight: 500;">
+                        {{extractContract(AiSignal)}}
+                      </span>
+                      <span style="font-size: 12px;">
+                        {{extractDateAndValues(AiSignal)}}
+                      </span>
+                    </div>
+                    <div style="position: relative; cursor: pointer; line-height: 38px; margin-right:25px">
+                      <!-- <i (mouseenter)="hoveredData = AiSignal" (mouseleave)="hoveredData = null" class="fa fa-light fa-eye"></i> -->
+                      <img src="//am708403.blob.core.windows.net/images/optionpi/img/Visualise.png" width="20px" height="20px" style="min-width:20px"
+                      (mouseenter)="hoveredData = AiSignal" (mouseleave)="hoveredData = null"
+                      >
+                      <div *ngIf="hoveredData === AiSignal">
+                        <app-custom-eye-hover [AiSignal] ="AiSignal" [index]= "i"></app-custom-eye-hover>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <ul>
+                      <li class="text-center" style="margin-right:20px; ">
+                        <a class="mobilePlaceOrder" (click)="loadOptionModal(AiSignal.Underlying, extractContract(AiSignal), AiSignal.OptionContracts)">
+                          Place Order
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                  <div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="PaginationData.length == 0">
+              <div class="mobileEmptyTable">There is currently no entries available</div>
+            </ng-container>
+          </div>
+          
+        </div>
+        <nav *ngIf="!isLoadingScreenerResult && AiSignalResult.length > 10" aria-label="..." class="ScreenerPagination">
+          <ul class="pagination">
+            <li class="page-item" (click)="IsFirstPage ? null :previousPage()" [ngClass] = {disabled:IsFirstPage}>
+              <a class="page-link">
+                <i class="fa fa-arrow-left"></i>
+                <span>Previous</span>
+              </a>
+            </li>
+            <li class="d-flex">
+              <ul>
+                <li *ngFor="let pageNum of Pages" class="page-item" [ngClass]="{active: CurrentPage===pageNum}">
+                  <span class="page-link" (click)="goToPage(pageNum)">{{pageNum}}</span>
+                </li>
+              </ul>
+              <span class="mobPagination">Page {{CurrentPage}} of {{TotalPage}}</span>
+            </li>
+            <li class="page-item" (click)="IsLastPage ? null :nextPage()" [ngClass] = {disabled:IsLastPage}>
+              <a class="page-link">
+                <span>Next</span>
+                <i class="fa fa-arrow-right"></i>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+</div>
+<ow-analytics-tab></ow-analytics-tab>

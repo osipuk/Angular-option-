@@ -1,0 +1,230 @@
+<div class="modal-header">
+    <h3>Close Position</h3>
+    <button type="button" class="btn-close" (click)="modal.dismiss('Cross click')" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <!-- CloseStockPosition -->
+    <div class="AccountModal PlaceOrderModal" id="CloseStockPosition" aria-hidden="true">
+        <div class="modal-content PlaceOrderContent">
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            <h3>Close Stock Position</h3>
+            <!-- Modal Content Start -->
+            <div class="PlaceOrderTabPannel">
+                <div class="tab-content PlaceOrderTabContent1" id="PlaceTabContent">
+                    <!-- Product List-->
+                    <div class="tab-pane fade show active ProductListContent" id="ProductList" role="tabpanel"
+                        aria-labelledby="ProductList-tab">
+                        <div class="ProductListContentTop">
+                            <div class="optionStockMain">
+                                <div class="SelectSymbol">
+                                    <label>Symbol</label>
+                                    <div>
+                                        {{StockPositionToClose.Product.Symbol}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-content OptionStockContent" id="OptionStockContent">
+                                <!-- Stock Content -->
+                                <div class="tab-pane fade show active StockContentMain" id="Stock" role="tabpanel"
+                                    aria-labelledby="Stock-tab">
+                                    <div class="StockContentMainTop">
+                                        <ul>
+                                            <li>
+                                                <div>
+                                                    <p>Last</p>
+                                                    <h2>{{(StockData$ | async)?.LastTradedPrice | number}}</h2>
+                                                </div>
+                                                <div>
+                                                    <p>Today Volume</p>
+                                                    <h2>{{(StockData$ | async)?.CumulativeVolume | number}}</h2>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="DangerBg">
+                                                    <div>
+                                                        <p>Bid Vol</p>
+                                                        <p>Bid</p>
+                                                    </div>
+                                                </div>
+                                                <div class="SuccessBg">
+                                                    <div>
+                                                        <p>Ask</p>
+                                                        <p>Ask Vol</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div>
+                                                    <div>
+                                                        <p>{{(StockData$ | async)?.BidSize | number}}</p>
+                                                        <p>{{(StockData$ | async)?.BidPrice | number}}</p>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div>
+                                                        <p>{{(StockData$ | async)?.AskSize | number}}</p>
+                                                        <p>{{(StockData$ | async)?.AskPrice | number}}</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="StockContentMainBtm">
+                                        <form class="OptForm" [formGroup]="StockOrderForm"
+                                            (ngSubmit)="submitStockOrder()">
+                                            <div class="form-control">
+                                                <label>Action</label>
+                                                <div>
+                                                    {{ StockPositionToClose.Action }}
+                                                </div>
+                                            </div>
+                                            <div class="form-control">
+                                                <label>Quantity</label>
+                                                <div>
+                                                    <input formControlName="StockQuantity" type="text" name="quantity"
+                                                        placeholder="1">
+                                                    <select formControlName="SelectedStockUnitType"
+                                                        class="form-select w-50" aria-label="Default select example">
+                                                        <option *ngFor="let unitType of StockUnitTypeList"
+                                                            [ngValue]="unitType">
+                                                            {{ unitType.Display }}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-control">
+                                                <label>Type</label>
+                                                <select formControlName="SelectedStockOrderType" class="form-select"
+                                                    aria-label="Default select example">
+                                                    <option *ngFor="let orderType of StockOrderTypeList"
+                                                        [ngValue]="orderType">
+                                                        {{ orderType.Display }}
+                                                    </option>
+                                                </select>
+                                                {{StockOrderForm.value.orderType}}
+                                            </div>
+                                            <div class="form-control"
+                                                *ngIf="StockOrderForm.value.SelectedStockOrderType.Name === 'Limit'">
+                                                <label>Limit Price</label>
+                                                <div>
+                                                    <input formControlName="StockLimitPrice" type="text" name="price">
+                                                    <a (click)="decreaseStockLimitPrice()" class="DangerBg">
+                                                        <i class="bi bi-arrow-down-circle"></i>
+                                                    </a>
+                                                    <a (click)="increaseStockLimitPrice()" class="SuccessBg">
+                                                        <i class="bi bi-arrow-up-circle"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div class="form-control"
+                                                *ngIf="StockOrderForm.value.SelectedStockOrderType.Name === 'Stop'">
+                                                <label>Stop Price</label>
+                                                <div>
+                                                    <input formControlName="StockStopPrice" type="text" name="price">
+                                                    <a (click)="decreaseStockStopPrice()" class="DangerBg">
+                                                        <i class="bi bi-arrow-down-circle"></i>
+                                                    </a>
+                                                    <a (click)="increaseStockStopPrice()" class="SuccessBg">
+                                                        <i class="bi bi-arrow-up-circle"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div class="form-control"
+                                                *ngIf="StockOrderForm.value.SelectedStockOrderType.Name === 'Market'">
+                                            </div>
+                                            <div class="form-control">
+                                                <label>Validity</label>
+                                                <div class="radioDefault">
+                                                    <label>
+                                                        <input formControlName="SelectedStockValidity" type="radio"
+                                                            value="GTC" /> GTC </label>
+                                                    <label>
+                                                        <input formControlName="SelectedStockValidity" type="radio"
+                                                            value="Day" checked /> Day </label>
+                                                </div>
+                                            </div>
+                                            <div class="form-control">&nbsp;</div>
+                                            <div
+                                                style="width: 100%; float: left; border-top: 1px solid #d3d3d3; height: 0; margin-bottom: 10px;">
+                                                &nbsp;</div>
+                                            <div class="form-control">
+                                                <label
+                                                    style="width: 25%; float: left; margin-top: 10px;">Account</label>
+                                                <div>{{SelectedBrokerAccount.id}} ({{SelectedBrokerAccount.brokerType}})
+                                                </div>
+                                            </div>
+                                            <div class="form-control">
+                                                <button type="submit" name="submit" class="BtnDefault w-100"
+                                                    data-bs-toggle="modal" data-bs-target="#ConfirmCloseStockOrder"
+                                                    data-bs-toggle="modal" data-bs-dismiss="modal"
+                                                    style="margin-top: 2px;"> Submit
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Strategy Template -->
+                    <!-- <div class="tab-pane fade" id="Strategy" role="tabpanel" aria-labelledby="Strategy-tab">...</div> -->
+                </div>
+            </div>
+            <!-- Modal Content End -->
+        </div>
+    </div>
+</div>
+
+<!-- Confirm Order -->
+<div class="modal fade AccountModal ConfirmOrderModal" id="ConfirmCloseStockOrder" aria-hidden="true" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-body">
+          <h4>This stock order will be created:</h4>
+          <table>
+            <tr>
+              <th>Action</th>
+              <td>
+                <span class="textHighlight">{{ConfirmedStockOrder.action}}</span>
+              </td>
+            </tr>
+            <tr>
+              <th>Account</th>
+              <td>{{ConfirmedStockOrder.account}} ({{ConfirmedStockOrder.broker}})</td>
+            </tr>
+            <tr>
+              <th>Product</th>
+              <td>{{ConfirmedStockOrder.product.ProductName}} ({{ConfirmedStockOrder.product.Symbol}})</td>
+            </tr>
+            <tr>
+              <th>Quantity</th>
+              <td>{{ConfirmedStockOrder.quantity}} {{ConfirmedStockOrder.unitType}}</td>
+            </tr>
+            <tr>
+              <th>Order Type</th>
+              <td>{{ConfirmedStockOrder.orderType}}</td>
+            </tr>
+            <tr *ngIf="ConfirmedStockOrder.orderType === 'Limit'">
+              <th>Limit Price</th>
+              <td>US$ {{ConfirmedStockOrder.limitPrice}}</td>
+            </tr>
+            <tr *ngIf="ConfirmedStockOrder.orderType === 'Stop'">
+              <th>Stop Price</th>
+              <td>US$ {{ConfirmedStockOrder.stopPrice}}</td>
+            </tr>
+            <tr>
+              <th>Validity</th>
+              <td>{{ConfirmedStockOrder.validity}}</td>
+            </tr>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button class="BtnSecondary" data-bs-target="#CloseStockPosition" data-bs-toggle="modal" data-bs-dismiss="modal">
+            <i class="bi bi-arrow-left"></i> Previous </button>
+          <button class="BtnDefault" (click)="confirmSendStockOrder()" data-bs-toggle="modal" data-bs-dismiss="modal">Submit <i class="bi bi-cart"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
